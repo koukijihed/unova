@@ -1,52 +1,58 @@
+import Image from "next/image";
+import Link from "next/link";
 import { fr } from "@/content/fr";
 
 type BrandLogoProps = {
   variant?: "default" | "inverse";
+  size?: "header" | "large";
   showText?: boolean;
   className?: string;
+  onClick?: () => void;
+  priority?: boolean;
 };
 
 export function BrandLogo({
   variant = "default",
+  size = "header",
   showText = true,
   className = "",
+  onClick,
+  priority = false,
 }: BrandLogoProps) {
   const inverse = variant === "inverse";
+  const large = size === "large";
 
   return (
-    <span className={`inline-flex items-center gap-2.5 ${className}`}>
-      {/* TODO: remplacer ce SVG provisoire par le logo officiel UNOVA. */}
-      <svg
-        viewBox="0 0 40 40"
-        aria-hidden="true"
-        className="size-9 shrink-0"
+    <Link
+      href="/"
+      onClick={onClick}
+      aria-label={fr.site.name}
+      className={`inline-flex items-center gap-2.5 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent ${className}`}
+    >
+      <span
+        className={`inline-flex shrink-0 items-center justify-center overflow-hidden ${
+          large ? "size-16 rounded-2xl" : "size-10 rounded-xl"
+        } ${inverse ? "bg-white" : ""}`}
       >
-        <rect
-          width="40"
-          height="40"
-          rx="11"
-          fill={inverse ? "rgba(255, 255, 255, 0.14)" : "var(--primary)"}
+        <Image
+          src="/brand/logo-icon.png"
+          alt={fr.brand.logoAlt}
+          width={large ? 128 : 80}
+          height={large ? 128 : 80}
+          sizes={large ? "96px" : "60px"}
+          priority={priority}
+          className={`${large ? "size-16" : "size-10"} scale-150 object-contain`}
         />
-        <path
-          d="M12 10.5v11c0 4.2 3.3 7.5 8 7.5s8-3.3 8-7.5v-11"
-          fill="none"
-          stroke="white"
-          strokeWidth="3.5"
-          strokeLinecap="round"
-        />
-        <circle cx="30.5" cy="10" r="3.5" fill="var(--accent)" />
-      </svg>
+      </span>
       {showText ? (
         <span
-          className={`text-lg font-semibold tracking-tight ${
-            inverse ? "text-white" : "text-primary"
-          }`}
+          className={`font-sans font-bold tracking-tight ${
+            large ? "text-3xl sm:text-4xl" : "text-xl"
+          } ${inverse ? "text-white" : "text-primary"}`}
         >
           {fr.site.name}
         </span>
-      ) : (
-        <span className="sr-only">{fr.brand.logoAlt}</span>
-      )}
-    </span>
+      ) : null}
+    </Link>
   );
 }

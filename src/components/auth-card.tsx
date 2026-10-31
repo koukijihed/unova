@@ -22,8 +22,7 @@ export function AuthCard({ title, description, children }: AuthCardProps) {
         />
 
         <div className="relative">
-          <BrandLogo variant="inverse" />
-          <p className="mt-12 max-w-sm text-3xl leading-tight font-semibold">
+          <p className="max-w-sm text-3xl leading-tight font-semibold">
             {fr.home.slogan}
           </p>
           <p className="mt-4 max-w-sm text-sm leading-6 text-slate-300">
@@ -35,11 +34,11 @@ export function AuthCard({ title, description, children }: AuthCardProps) {
       </aside>
 
       <div className="p-6 sm:p-10">
-        <div className="lg:hidden">
-          <BrandLogo />
+        <div className="mb-6">
+          <BrandLogo size="large" priority />
         </div>
 
-        <h1 className="mt-6 text-2xl font-bold tracking-tight text-primary sm:text-3xl lg:mt-0">
+        <h1 className="text-2xl font-bold tracking-tight text-primary sm:text-3xl">
           {title}
         </h1>
         <p className="mt-2 text-sm leading-6 text-slate-600">{description}</p>

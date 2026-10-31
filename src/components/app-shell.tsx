@@ -162,12 +162,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-dvh bg-background text-foreground">
       <aside className="sticky top-0 hidden h-dvh w-72 shrink-0 flex-col bg-primary lg:flex">
         <div className="flex h-16 items-center border-b border-white/10 px-5">
-          <Link
-            href="/"
-            className="rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
-          >
-            <BrandLogo variant="inverse" />
-          </Link>
+          <BrandLogo variant="inverse" />
         </div>
         <SidebarNav pathname={pathname} />
       </aside>
@@ -226,13 +221,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       >
         <div className="flex h-full flex-col">
           <div className="flex h-16 items-center justify-between border-b border-white/10 px-5">
-            <Link
-              href="/"
+            <BrandLogo
+              variant="inverse"
               onClick={() => setMenuOpen(false)}
-              className="rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
-            >
-              <BrandLogo variant="inverse" />
-            </Link>
+            />
             <button
               ref={closeButtonRef}
               type="button"

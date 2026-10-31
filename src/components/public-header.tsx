@@ -6,12 +6,7 @@ export function PublicHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-primary/10 bg-white/90 backdrop-blur">
       <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-6 py-4">
-        <Link
-          href="/"
-          className="rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
-        >
-          <BrandLogo />
-        </Link>
+        <BrandLogo priority />
 
         <nav
           aria-label={fr.publicNav.ariaLabel}
