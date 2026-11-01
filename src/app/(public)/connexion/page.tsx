@@ -1,47 +1,50 @@
 ﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth-card";
-import { FormField } from "@/components/form-field";
+import { LoginForm } from "@/components/auth/login-form";
 import { fr } from "@/content/fr";
+import { safeRedirectPath } from "@/lib/auth/redirects";
+import { redirectIfAuthenticated } from "@/lib/auth/session";
+
+export const instant = false;
 
 export const metadata: Metadata = {
   title: fr.auth.login.metadataTitle,
 };
 
-export default function LoginPage() {
+type LoginPageProps = {
+  searchParams: Promise<{
+    redirection?: string;
+    erreur?: string;
+  }>;
+};
+
+function getErrorMessage(code: string | undefined): string | undefined {
+  if (!code) {
+    return undefined;
+  }
+
+  if (code === "session-expiree") {
+    return fr.auth.errors.sessionExpired;
+  }
+
+  return fr.auth.errors.invalidLink;
+}
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  await redirectIfAuthenticated();
+  const params = await searchParams;
+
   return (
     <div className="mx-auto w-full max-w-6xl px-6 py-12 sm:py-16">
       <AuthCard
         title={fr.auth.login.title}
         description={fr.auth.login.description}
       >
-        <form>
-          <fieldset disabled className="space-y-5">
-            <FormField
-              id="login-email"
-              label={fr.auth.login.emailLabel}
-              type="email"
-              autoComplete="email"
-              placeholder={fr.auth.login.emailPlaceholder}
-              disabled
-            />
-            <FormField
-              id="login-password"
-              label={fr.auth.login.passwordLabel}
-              type="password"
-              autoComplete="current-password"
-              placeholder={fr.auth.login.passwordPlaceholder}
-              disabled
-            />
-            <button
-              type="submit"
-              disabled
-              className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-primary px-5 text-sm font-semibold text-white transition-colors hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-600"
-            >
-              {fr.auth.login.submit}
-            </button>
-          </fieldset>
-        </form>
+        <LoginForm
+          redirectTo={safeRedirectPath(params.redirection)}
+          initialError={getErrorMessage(params.erreur)}
+        />
 
         <p className="mt-6 text-sm text-slate-600">
           {fr.auth.login.noAccount}{" "}

@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { Avatar } from "@/components/avatar";
 import { BrandLogo } from "@/components/brand-logo";
+import { UserMenu } from "@/components/user-menu";
 import { fr } from "@/content/fr";
+import type { ProfileNames } from "@/lib/types";
 
 type SidebarNavProps = {
   pathname: string;
@@ -56,7 +57,7 @@ function SidebarNav({ pathname, onNavigate }: SidebarNavProps) {
 
       <div className="border-t border-white/10 p-4">
         <p className="rounded-xl bg-white/[0.06] px-3 py-2 text-xs leading-5 text-slate-300">
-          {fr.app.sidebarNotice}
+          {fr.app.sidebarFooter}
         </p>
       </div>
     </>
@@ -103,7 +104,13 @@ function SearchIcon() {
   );
 }
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({
+  children,
+  profile,
+}: {
+  children: React.ReactNode;
+  profile: ProfileNames;
+}) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -196,13 +203,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="ml-auto flex items-center gap-3">
-            <Link
-              href="/profil"
-              aria-label={fr.app.profileLink}
-              className="rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-            >
-              <Avatar />
-            </Link>
+            <UserMenu profile={profile} />
           </div>
         </header>
 

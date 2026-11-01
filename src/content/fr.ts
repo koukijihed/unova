@@ -52,7 +52,6 @@ export const fr = {
     },
   },
   auth: {
-    notice: "Disponible prochainement",
     login: {
       metadataTitle: "Connexion — UNOVA",
       title: "Connexion",
@@ -61,7 +60,9 @@ export const fr = {
       emailPlaceholder: "Votre adresse e-mail",
       passwordLabel: "Mot de passe",
       passwordPlaceholder: "Votre mot de passe",
+      forgotPassword: "Mot de passe oublié ?",
       submit: "Se connecter",
+      submitting: "Connexion…",
       noAccount: "Pas encore de compte ?",
       createAccount: "Créer un compte",
     },
@@ -77,14 +78,76 @@ export const fr = {
       emailPlaceholder: "Votre adresse e-mail",
       passwordLabel: "Mot de passe",
       passwordPlaceholder: "Choisissez un mot de passe",
+      passwordHint: "10 caractères minimum.",
+      confirmationLabel: "Confirmation du mot de passe",
+      confirmationPlaceholder: "Confirmez votre mot de passe",
       submit: "Créer mon compte",
+      submitting: "Création du compte…",
+      success: "Vérifiez votre boîte mail pour confirmer votre adresse.",
       hasAccount: "Vous avez déjà un compte ?",
       signIn: "Se connecter",
     },
+    forgot: {
+      metadataTitle: "Mot de passe oublié — UNOVA",
+      title: "Mot de passe oublié",
+      description:
+        "Indiquez votre adresse e-mail pour recevoir un lien de réinitialisation.",
+      emailLabel: "Adresse e-mail",
+      emailPlaceholder: "Votre adresse e-mail",
+      submit: "Envoyer le lien",
+      submitting: "Envoi en cours…",
+      success:
+        "Si un compte existe pour cette adresse, un e-mail de réinitialisation a été envoyé.",
+      backToLogin: "Retour à la connexion",
+    },
+    reset: {
+      metadataTitle: "Réinitialisation du mot de passe — UNOVA",
+      title: "Nouveau mot de passe",
+      description:
+        "Choisissez un nouveau mot de passe pour votre compte UNOVA.",
+      passwordLabel: "Nouveau mot de passe",
+      passwordPlaceholder: "Choisissez un nouveau mot de passe",
+      passwordHint: "10 caractères minimum.",
+      confirmationLabel: "Confirmation du mot de passe",
+      confirmationPlaceholder: "Confirmez votre nouveau mot de passe",
+      submit: "Mettre à jour le mot de passe",
+      submitting: "Mise à jour…",
+      success: "Votre mot de passe a été mis à jour.",
+      goToDashboard: "Accéder au tableau de bord",
+    },
+    errors: {
+      firstNameRequired: "Le prénom est obligatoire.",
+      firstNameTooLong: "Le prénom ne doit pas dépasser 80 caractères.",
+      lastNameRequired: "Le nom est obligatoire.",
+      lastNameTooLong: "Le nom ne doit pas dépasser 80 caractères.",
+      emailRequired: "L'adresse e-mail est obligatoire.",
+      emailInvalid: "Saisissez une adresse e-mail valide.",
+      passwordRequired: "Le mot de passe est obligatoire.",
+      passwordTooShort:
+        "Le mot de passe doit contenir au moins 10 caractères.",
+      confirmationRequired: "Confirmez votre mot de passe.",
+      confirmationMismatch: "Les mots de passe ne correspondent pas.",
+      invalidCredentials: "Adresse e-mail ou mot de passe incorrect.",
+      emailNotConfirmed:
+        "Confirmez votre adresse e-mail avant de vous connecter.",
+      tooManyAttempts:
+        "Trop de tentatives. Veuillez réessayer dans quelques minutes.",
+      signUpFailed:
+        "Impossible de créer le compte pour le moment. Veuillez réessayer.",
+      accountExists: "Un compte existe déjà avec cette adresse e-mail.",
+      resetRequestFailed:
+        "Impossible d'envoyer l'e-mail pour le moment. Veuillez réessayer.",
+      updatePasswordFailed:
+        "Impossible de mettre à jour le mot de passe. Veuillez réessayer.",
+      sessionExpired:
+        "Votre session a expiré. Connectez-vous pour continuer.",
+      invalidLink:
+        "Ce lien n'est pas valide ou a expiré. Demandez un nouveau lien.",
+      generic: "Une erreur est survenue. Veuillez réessayer.",
+    },
   },
   app: {
-    sidebarNotice:
-      "Aperçu de l'interface. L'authentification sera activée prochainement.",
+    sidebarFooter: "Votre université, un seul espace numérique.",
     nav: {
       ariaLabel: "Navigation de l'espace UNOVA",
       items: [
@@ -106,8 +169,21 @@ export const fr = {
     searchLabel: "Rechercher dans UNOVA",
     searchPlaceholder: "Rechercher dans UNOVA…",
     searchUnavailable: "La recherche sera disponible prochainement.",
-    profileLink: "Mon profil",
     avatarAlt: "Photo de profil",
+    userMenu: {
+      label: "Menu du compte",
+      open: "Ouvrir le menu du compte",
+      fallbackName: "Mon compte",
+      profile: "Mon profil",
+      signOut: "Se déconnecter",
+    },
+    dashboard: {
+      greeting: "Bonjour",
+      noRoleNotice:
+        "Votre compte n'est pas encore vérifié. La vérification par CIN sera disponible prochainement.",
+      comingSoonDescription:
+        "Les fonctionnalités de votre tableau de bord seront activées progressivement.",
+    },
     pages: {
       dashboard: {
         title: "Tableau de bord",

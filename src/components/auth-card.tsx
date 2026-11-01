@@ -43,30 +43,6 @@ export function AuthCard({ title, description, children }: AuthCardProps) {
         </h1>
         <p className="mt-2 text-sm leading-6 text-slate-600">{description}</p>
 
-        <div className="mt-6 flex items-center gap-2 rounded-xl border border-accent/30 bg-accent/10 px-4 py-3 text-sm font-medium text-primary">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            aria-hidden="true"
-            className="size-4 shrink-0"
-          >
-            <circle
-              cx="12"
-              cy="12"
-              r="8.5"
-              stroke="currentColor"
-              strokeWidth="1.8"
-            />
-            <path
-              d="M12 7.5V12l3 2"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-            />
-          </svg>
-          <span>{fr.auth.notice}</span>
-        </div>
-
         <div className="mt-6">{children}</div>
       </div>
     </div>

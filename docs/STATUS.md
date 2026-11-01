@@ -11,10 +11,19 @@ Dernière mise à jour : 31 octobre 2026
 - Logo UNOVA intégré avec `next/image` dans l'en-tête, le pied de page, la barre latérale et au-dessus des formulaires d'authentification.
 - Favicon et icône Apple générés depuis le logo (`src/app/icon.png`, `src/app/apple-icon.png`), favicon par défaut supprimé.
 - Page d'accueil avec slogan, présentation, cartes UNOVA Académique et UNOVA Gestion, et boutons d'action.
-- Pages `/connexion` et `/inscription` avec formulaires visibles, désactivés et notice « Disponible prochainement ».
-- Coquille authentifiée avec barre latérale sur ordinateur, tiroir accessible sur mobile, barre supérieure, recherche désactivée et avatar neutre.
-- Navigation active dans la barre latérale pour les onze espaces de l'application.
-- Onze pages d'attente avec titre, phrase explicative et badge « Bientôt disponible ».
+- Connexion Supabase avec `@supabase/supabase-js` et `@supabase/ssr` (clé publique uniquement).
+- Authentification par e-mail et mot de passe : inscription, connexion, déconnexion.
+- Confirmation d'adresse par e-mail via la route `/auth/callback`.
+- Réinitialisation du mot de passe : demande par e-mail et choix d'un nouveau mot de passe.
+- Rafraîchissement de la session à chaque requête via `src/proxy.ts`.
+- Routes de l'espace applicatif protégées côté serveur avec `supabase.auth.getUser()`.
+- Redirection des utilisateurs non connectés vers `/connexion?redirection=<chemin>`.
+- Redirection des utilisateurs connectés depuis `/connexion` et `/inscription` vers le tableau de bord.
+- Chargement du profil (`first_name`, `last_name`) et affichage du nom et des initiales dans la barre supérieure.
+- Menu utilisateur accessible au clavier avec « Mon profil » et « Se déconnecter ».
+- Tableau de bord avec le message « Bonjour, <prénom> » et notice lorsque le compte n'a aucun rôle.
+- Formulaires avec validation et messages d'erreur en français, erreurs par champ, état de chargement et bouton désactivé pendant l'envoi.
+- Coquille authentifiée avec barre latérale sur ordinateur, tiroir accessible sur mobile et navigation active.
 - Pages `error.tsx`, `loading.tsx` et 404 en français.
 - Mise en page responsive et états de focus visibles.
 - Variables CSS de marque (`primary`, `accent`, `background`, `foreground`) exposées à Tailwind.
@@ -24,9 +33,9 @@ Dernière mise à jour : 31 octobre 2026
 
 ## Prévu
 
-- Authentification Supabase et protection des routes de l'espace applicatif.
-- Gestion des rôles et permissions côté base de données et serveur.
-- Activation réelle des formulaires de connexion et d'inscription.
+- Vérification de l'identité étudiante par CIN.
+- Affichage et gestion des rôles dans l'interface.
+- Téléversement et affichage de la photo de profil.
 - Recherche fonctionnelle dans l'espace applicatif.
 - Import et consultation des données académiques officielles vérifiées.
 - Notifications et communications institutionnelles.
@@ -34,6 +43,7 @@ Dernière mise à jour : 31 octobre 2026
 
 ## Limites actuelles
 
-- L'espace applicatif est une coquille : les routes ne sont pas encore protégées.
-- Aucune donnée académique, aucun utilisateur et aucune statistique ne sont affichés.
-- Les formulaires et la recherche sont volontairement désactivés.
+- Seule l'authentification par e-mail est disponible ; aucune vérification CIN n'est encore proposée.
+- L'espace applicatif est protégé, mais ses pages métier restent des pages d'attente.
+- Aucune donnée académique, aucun utilisateur fictif et aucune statistique ne sont affichés.
+- La recherche est volontairement désactivée.
