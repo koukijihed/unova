@@ -1,10 +1,14 @@
 import type { User } from "@supabase/supabase-js";
 import { cache } from "react";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { Profile, ProfileNames, UserRole } from "@/lib/types";
 
 export const getCurrentUser = cache(async (): Promise<User | null> => {
+  // Supabase lit l'heure système (Date.now) : forcer un rendu à la requête
+  // évite l'erreur de prérendu de Next.js avec Cache Components.
+  await connection();
   const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase.auth.getUser();
 
