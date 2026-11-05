@@ -1,8 +1,10 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
+import { hasManagementRole } from "@/lib/auth/roles";
 import {
   getCurrentProfile,
+  getCurrentRoles,
   getCurrentUser,
   getProfileNames,
 } from "@/lib/auth/session";
@@ -25,8 +27,15 @@ export default async function AppLayout({
     redirect(`/connexion?redirection=${encodeURIComponent(redirectTo)}`);
   }
 
-  const profile = await getCurrentProfile();
+  const [profile, roles] = await Promise.all([
+    getCurrentProfile(),
+    getCurrentRoles(),
+  ]);
   const profileNames = getProfileNames(profile, user);
 
-  return <AppShell profile={profileNames}>{children}</AppShell>;
+  return (
+    <AppShell profile={profileNames} canManage={hasManagementRole(roles)}>
+      {children}
+    </AppShell>
+  );
 }

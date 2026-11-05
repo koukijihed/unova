@@ -33,3 +33,20 @@ export type StudentEnrollment = {
   academic_year_id: string;
   status: EnrollmentStatus;
 };
+
+export type ManagementClass = {
+  id: string;
+  name: string;
+  programCode: string;
+  academicYearLabel: string;
+  label: string;
+};
+
+export type ManagementStudent = {
+  rosterId: string;
+  firstName: string;
+  lastName: string;
+  claimed: boolean;
+  enrollmentId: string | null;
+  enrollmentStatus: EnrollmentStatus | null;
+};

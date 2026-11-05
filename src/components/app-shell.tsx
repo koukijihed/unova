@@ -10,10 +10,11 @@ import type { ProfileNames } from "@/lib/types";
 
 type SidebarNavProps = {
   pathname: string;
+  items: ReadonlyArray<{ label: string; href: string }>;
   onNavigate?: () => void;
 };
 
-function SidebarNav({ pathname, onNavigate }: SidebarNavProps) {
+function SidebarNav({ pathname, items, onNavigate }: SidebarNavProps) {
   return (
     <>
       <nav
@@ -21,7 +22,7 @@ function SidebarNav({ pathname, onNavigate }: SidebarNavProps) {
         className="flex-1 overflow-y-auto px-3 py-4"
       >
         <ul className="space-y-1">
-          {fr.app.nav.items.map((item) => {
+          {items.map((item) => {
             const active =
               pathname === item.href || pathname.startsWith(`${item.href}/`);
 
@@ -107,11 +108,16 @@ function SearchIcon() {
 export function AppShell({
   children,
   profile,
+  canManage,
 }: {
   children: React.ReactNode;
   profile: ProfileNames;
+  canManage: boolean;
 }) {
   const pathname = usePathname();
+  const navItems = fr.app.nav.items.filter(
+    (item) => item.href !== "/gestion" || canManage,
+  );
   const [menuOpen, setMenuOpen] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -171,7 +177,7 @@ export function AppShell({
         <div className="flex h-16 items-center border-b border-white/10 px-5">
           <BrandLogo variant="inverse" />
         </div>
-        <SidebarNav pathname={pathname} />
+        <SidebarNav pathname={pathname} items={navItems} />
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
@@ -239,6 +245,7 @@ export function AppShell({
 
           <SidebarNav
             pathname={pathname}
+            items={navItems}
             onNavigate={() => setMenuOpen(false)}
           />
         </div>

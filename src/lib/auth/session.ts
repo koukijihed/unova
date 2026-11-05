@@ -68,6 +68,16 @@ export const getCurrentUserRoles = cache(
   },
 );
 
+export const getCurrentRoles = cache(async (): Promise<string[] | null> => {
+  const roles = await getCurrentUserRoles();
+
+  if (roles === null) {
+    return null;
+  }
+
+  return roles.map((role) => role.role_code);
+});
+
 export const getCurrentStudentProfile = cache(
   async (): Promise<StudentProfile | null> => {
     const user = await getCurrentUser();

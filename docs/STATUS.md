@@ -22,6 +22,9 @@ Dernière mise à jour : 5 novembre 2026
 - Chargement du profil (`first_name`, `last_name`) et affichage du nom et des initiales dans la barre supérieure.
 - Menu utilisateur accessible au clavier avec « Mon profil » et « Se déconnecter ».
 - Tableau de bord avec le message « Bonjour, <prénom> » et notices d'inscription : aucun profil étudiant (lien vers `/verification`), en attente, acceptée, refusée, interrompue ou terminée.
+- Écran d'acceptation des inscriptions pour les administrateurs et directeurs de programme : `/gestion` et `/gestion/etudiants`, sélection de classe, recherche par nom, compteurs, actions Accepter / Refuser / Remettre en attente et « Tout accepter » avec confirmation.
+- Accès à `/gestion` réservé aux rôles `admin` et `director`, avec entrée « Gestion » affichée uniquement pour ces rôles.
+- Appels aux fonctions `director_students`, `director_set_enrollment` et `director_accept_all` avec le client Supabase de l'utilisateur connecté ; les permissions restent appliquées par la base de données.
 - Vérification de l'identité étudiante par CIN sur `/verification` : CIN à 8 chiffres et nom de famille, empreinte HMAC-SHA256 calculée côté serveur, appel à la fonction `claim_roster` et messages d'erreur en français.
 - Client Supabase administrateur réservé au serveur (`src/lib/supabase/admin.ts`) avec `SUPABASE_SECRET_KEY` et `CIN_PEPPER`, jamais exposés au navigateur.
 - Script d'import de la liste officielle (`scripts/import-roster.mjs`) : simulation par défaut, `--apply`, `--skip-invalid`, `--self-test`, contrôle des classes de l'année courante et insertion par lots.
@@ -37,19 +40,23 @@ Dernière mise à jour : 5 novembre 2026
 
 ## Prévu
 
-- Écran d'acceptation des inscriptions par le directeur de parcours.
+- Gestion des enseignants.
+- Gestion des programmes et des classes.
+- Gestion des années universitaires.
 - Page d'import de la liste officielle dans l'administration.
+- Gestion des emplois du temps.
+- Statistiques de gestion.
 - Affichage et gestion des rôles dans l'interface.
 - Téléversement et affichage de la photo de profil.
-- Recherche fonctionnelle dans l'espace applicatif.
+- Recherche globale fonctionnelle dans l'en-tête de l'espace applicatif.
 - Import et consultation des données académiques officielles vérifiées.
 - Notifications et communications institutionnelles.
 - Tests automatisés et déploiement.
 
 ## Limites actuelles
 
-- La vérification CIN est disponible, mais l'acceptation des inscriptions par le directeur n'a pas encore d'écran dédié.
+- L'acceptation des inscriptions est disponible pour les administrateurs et les directeurs de programme ; les autres outils de gestion restent à venir.
 - L'import de la liste officielle se fait uniquement en ligne de commande ; aucune page d'administration n'est encore proposée.
-- L'espace applicatif est protégé, mais ses pages métier restent des pages d'attente.
+- L'espace applicatif est protégé, mais la plupart de ses pages métier restent des pages d'attente.
 - Aucune donnée académique, aucun utilisateur fictif et aucune statistique ne sont affichés.
-- La recherche est volontairement désactivée.
+- La recherche globale de l'en-tête est volontairement désactivée ; la recherche par nom est disponible dans la gestion des étudiants.

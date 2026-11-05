@@ -196,6 +196,133 @@ export const fr = {
       comingSoonDescription:
         "Les fonctionnalités de votre tableau de bord seront activées progressivement.",
     },
+    management: {
+      metadataTitle: "Gestion — UNOVA",
+      eyebrow: "Espace de gestion",
+      title: "Gestion",
+      description:
+        "Gérez les inscriptions et les structures pédagogiques de votre établissement.",
+      overviewTitle: "Outils de gestion",
+      overviewDescription:
+        "Accédez aux outils de gestion de votre établissement. Les espaces marqués « Bientôt disponible » seront activés progressivement.",
+      cards: {
+        students: {
+          title: "Étudiants",
+          description:
+            "Consultez les étudiants de vos classes et traitez les demandes d'inscription.",
+          action: "Ouvrir",
+        },
+        teachers: {
+          title: "Enseignants",
+          description:
+            "La gestion des enseignants sera disponible prochainement.",
+        },
+        programs: {
+          title: "Programmes et classes",
+          description:
+            "La gestion des programmes et des classes sera disponible prochainement.",
+        },
+        academicYears: {
+          title: "Années universitaires",
+          description:
+            "La gestion des années universitaires sera disponible prochainement.",
+        },
+        schedules: {
+          title: "Emplois du temps",
+          description:
+            "La gestion des emplois du temps sera disponible prochainement.",
+        },
+        statistics: {
+          title: "Statistiques",
+          description:
+            "Les statistiques de gestion seront disponibles prochainement.",
+        },
+      },
+      students: {
+        metadataTitle: "Étudiants — Gestion — UNOVA",
+        eyebrow: "Gestion des étudiants",
+        title: "Étudiants",
+        description:
+          "Sélectionnez une classe pour consulter ses étudiants et traiter les demandes d'inscription.",
+        classLabel: "Classe",
+        classPlaceholder: "Sélectionner une classe",
+        showClass: "Afficher",
+        searchLabel: "Rechercher un étudiant",
+        searchPlaceholder: "Nom ou prénom",
+        searchSubmit: "Rechercher",
+        clearSearch: "Effacer la recherche",
+        noClasses: "Aucune classe n'est disponible pour votre compte.",
+        noClassSelected:
+          "Sélectionnez une classe pour afficher ses étudiants.",
+        noStudents: "Aucun étudiant n'est inscrit dans cette classe.",
+        noSearchResults:
+          "Aucun étudiant ne correspond à votre recherche.",
+        classesLoadFailed:
+          "Impossible de charger les classes pour le moment.",
+        studentsLoadFailed:
+          "Impossible de charger les étudiants pour le moment.",
+        invalidClass:
+          "Cette classe n'est pas accessible depuis votre compte.",
+        countersAriaLabel: "Répartition des étudiants",
+        counters: {
+          total: "Total",
+          pending: "En attente",
+          accepted: "Acceptés",
+          rejected: "Refusés",
+          notRegistered: "Pas encore inscrits",
+        },
+        table: {
+          caption: "Liste des étudiants de la classe",
+          lastName: "Nom",
+          firstName: "Prénom",
+          status: "Statut",
+          actions: "Actions",
+        },
+        statuses: {
+          pending: "En attente",
+          accepted: "Accepté",
+          rejected: "Refusé",
+          interrupted: "Études interrompues",
+          graduated: "Diplômé",
+          notRegistered: "Pas encore inscrit",
+          unavailable: "Inscription indisponible",
+        },
+        actions: {
+          accept: "Accepter",
+          reject: "Refuser",
+          reset: "Remettre en attente",
+          acceptAll: "Tout accepter",
+          acceptAllTitle: "Accepter toutes les inscriptions",
+          acceptAllHint:
+            "Cette action acceptera toutes les inscriptions en attente de la classe sélectionnée.",
+          acceptAllDescriptionOne:
+            "1 inscription en attente sera acceptée.",
+          acceptAllDescriptionMany:
+            "{count} inscriptions en attente seront acceptées.",
+          acceptAllConfirm: "Confirmer",
+          acceptAllCancel: "Annuler",
+          processing: "Traitement…",
+          acceptAllDisabled: "Aucune inscription en attente.",
+          noActions: "Aucune action disponible",
+          unknownStudent: "Étudiant sans nom",
+          actionFor: "{action} — {name}",
+        },
+        messages: {
+          accepted: "L'inscription a été acceptée.",
+          rejected: "L'inscription a été refusée.",
+          reset: "L'inscription a été remise en attente.",
+          acceptAllCountOne: "1 inscription a été acceptée.",
+          acceptAllCountMany: "{count} inscriptions ont été acceptées.",
+          acceptAllNone: "Aucune inscription en attente n'a été trouvée.",
+          forbidden: "Accès refusé.",
+          notFound: "Inscription introuvable.",
+          sessionExpired:
+            "Votre session a expiré. Reconnectez-vous pour continuer.",
+          generic:
+            "L'action n'a pas pu être effectuée. Veuillez réessayer.",
+        },
+      },
+    },
     verification: {
       metadataTitle: "Vérification — UNOVA",
       eyebrow: "Vérification étudiante",
