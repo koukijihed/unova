@@ -179,10 +179,56 @@ export const fr = {
     },
     dashboard: {
       greeting: "Bonjour",
-      noRoleNotice:
-        "Votre compte n'est pas encore vérifié. La vérification par CIN sera disponible prochainement.",
+      noRoleNotice: "Aucun rôle n'est encore attribué à votre compte.",
+      noProfileNotice:
+        "Votre compte n'est pas encore vérifié. Vérifiez votre identité avec votre CIN pour accéder à votre parcours.",
+      verifyLink: "Vérifier mon identité",
+      enrollmentPending:
+        "Votre inscription est en attente de validation par le directeur de votre parcours.",
+      enrollmentAccepted: "Votre inscription a été acceptée.",
+      enrollmentRejected:
+        "Votre inscription n'a pas été acceptée. Contactez l'administration.",
+      enrollmentInterrupted:
+        "Votre inscription est interrompue. Contactez l'administration.",
+      enrollmentGraduated: "Vous avez terminé votre parcours.",
+      enrollmentUnavailable:
+        "Votre inscription est en cours de traitement. Actualisez la page dans quelques instants.",
       comingSoonDescription:
         "Les fonctionnalités de votre tableau de bord seront activées progressivement.",
+    },
+    verification: {
+      metadataTitle: "Vérification — UNOVA",
+      eyebrow: "Vérification étudiante",
+      title: "Vérifiez votre identité",
+      description:
+        "Pour accéder à votre parcours, confirmez votre identité à partir de votre CIN et de votre nom de famille.",
+      whyTitle: "Pourquoi cette vérification ?",
+      why:
+        "Cette étape permet de rattacher votre compte à votre inscription officielle et de vous donner accès aux services de votre parcours.",
+      cinLabel: "CIN",
+      cinPlaceholder: "8 chiffres",
+      cinHint: "Saisissez les 8 chiffres de votre carte d'identité nationale.",
+      lastNameLabel: "Nom de famille",
+      lastNamePlaceholder: "Votre nom de famille",
+      submit: "Vérifier mon identité",
+      submitting: "Vérification…",
+      privacyTitle: "Confidentialité",
+      privacy:
+        "Votre CIN n'est jamais stocké en clair. Seule une empreinte cryptographique est conservée pour vérifier votre identité.",
+      approvalTitle: "Validation de l'inscription",
+      approval:
+        "Après la vérification, le directeur de votre parcours doit approuver votre inscription avant l'accès complet à votre espace.",
+      errors: {
+        cinInvalid: "Le CIN doit contenir exactement 8 chiffres.",
+        lastNameRequired: "Le nom de famille est obligatoire.",
+        notFoundOrClaimed:
+          "Aucune correspondance trouvée. Vérifiez votre CIN et votre nom, ou contactez l'administration de votre établissement.",
+        tooManyAttempts: "Trop de tentatives. Réessayez dans une heure.",
+        emailNotConfirmed: "Confirmez d'abord votre adresse email.",
+        alreadyVerified: "Votre compte est déjà vérifié.",
+        unavailable:
+          "La vérification est momentanément indisponible. Réessayez plus tard.",
+      },
     },
     pages: {
       dashboard: {

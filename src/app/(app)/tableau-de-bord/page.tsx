@@ -1,13 +1,48 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Notice } from "@/components/notice";
 import { fr } from "@/content/fr";
 import {
+  getCurrentEnrollment,
   getCurrentProfile,
+  getCurrentStudentProfile,
   getCurrentUser,
   getCurrentUserRoles,
   getProfileNames,
 } from "@/lib/auth/session";
+import type { EnrollmentStatus } from "@/lib/types";
 
 export const instant = false;
+
+function getEnrollmentNotice(status: EnrollmentStatus) {
+  switch (status) {
+    case "pending":
+      return {
+        tone: "warning" as const,
+        message: fr.app.dashboard.enrollmentPending,
+      };
+    case "accepted":
+      return {
+        tone: "success" as const,
+        message: fr.app.dashboard.enrollmentAccepted,
+      };
+    case "rejected":
+      return {
+        tone: "error" as const,
+        message: fr.app.dashboard.enrollmentRejected,
+      };
+    case "interrupted":
+      return {
+        tone: "warning" as const,
+        message: fr.app.dashboard.enrollmentInterrupted,
+      };
+    case "graduated":
+      return {
+        tone: "success" as const,
+        message: fr.app.dashboard.enrollmentGraduated,
+      };
+  }
+}
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
@@ -16,12 +51,20 @@ export default async function DashboardPage() {
     redirect("/connexion?redirection=%2Ftableau-de-bord");
   }
 
-  const [profile, roles] = await Promise.all([
+  const [profile, roles, studentProfile, enrollment] = await Promise.all([
     getCurrentProfile(),
     getCurrentUserRoles(),
+    getCurrentStudentProfile(),
+    getCurrentEnrollment(),
   ]);
   const { firstName } = getProfileNames(profile, user);
-  const showNoRoleNotice = roles !== null && roles.length === 0;
+  const isStudent = studentProfile !== null;
+  const hasNoRole = roles !== null && roles.length === 0;
+  const showNoProfileNotice = !isStudent && (roles === null || hasNoRole);
+  const showNoRoleNotice = !isStudent && hasNoRole;
+  const enrollmentNotice = enrollment
+    ? getEnrollmentNotice(enrollment.status)
+    : null;
 
   return (
     <section className="mx-auto w-full max-w-4xl">
@@ -38,33 +81,34 @@ export default async function DashboardPage() {
         {fr.app.pages.dashboard.description}
       </p>
 
-      {showNoRoleNotice ? (
-        <div
-          role="status"
-          className="mt-8 flex gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-900"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            aria-hidden="true"
-            className="mt-0.5 size-5 shrink-0"
+      {showNoProfileNotice ? (
+        <Notice tone="warning">
+          <p>{fr.app.dashboard.noProfileNotice}</p>
+          <Link
+            href="/verification"
+            className="mt-3 inline-flex h-10 items-center justify-center rounded-xl bg-primary px-4 text-sm font-semibold text-white transition-colors hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
-            <circle
-              cx="12"
-              cy="12"
-              r="8.5"
-              stroke="currentColor"
-              strokeWidth="1.8"
-            />
-            <path
-              d="M12 8v4.5M12 16h.01"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-            />
-          </svg>
+            {fr.app.dashboard.verifyLink}
+          </Link>
+        </Notice>
+      ) : null}
+
+      {showNoRoleNotice ? (
+        <Notice tone="info">
           <p>{fr.app.dashboard.noRoleNotice}</p>
-        </div>
+        </Notice>
+      ) : null}
+
+      {isStudent ? (
+        enrollmentNotice ? (
+          <Notice tone={enrollmentNotice.tone}>
+            <p>{enrollmentNotice.message}</p>
+          </Notice>
+        ) : (
+          <Notice tone="warning">
+            <p>{fr.app.dashboard.enrollmentUnavailable}</p>
+          </Notice>
+        )
       ) : null}
 
       <div className="mt-8 rounded-2xl border border-primary/10 bg-white p-6 shadow-sm">

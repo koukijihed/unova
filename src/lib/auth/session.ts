@@ -3,7 +3,13 @@ import { cache } from "react";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import type { Profile, ProfileNames, UserRole } from "@/lib/types";
+import type {
+  Profile,
+  ProfileNames,
+  StudentEnrollment,
+  StudentProfile,
+  UserRole,
+} from "@/lib/types";
 
 export const getCurrentUser = cache(async (): Promise<User | null> => {
   // Supabase lit l'heure système (Date.now) : forcer un rendu à la requête
@@ -59,6 +65,54 @@ export const getCurrentUserRoles = cache(
     }
 
     return (data ?? []) as UserRole[];
+  },
+);
+
+export const getCurrentStudentProfile = cache(
+  async (): Promise<StudentProfile | null> => {
+    const user = await getCurrentUser();
+
+    if (!user) {
+      return null;
+    }
+
+    const supabase = await createServerSupabaseClient();
+    const { data, error } = await supabase
+      .from("student_profiles")
+      .select("user_id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (error || !data) {
+      return null;
+    }
+
+    return data as StudentProfile;
+  },
+);
+
+export const getCurrentEnrollment = cache(
+  async (): Promise<StudentEnrollment | null> => {
+    const user = await getCurrentUser();
+
+    if (!user) {
+      return null;
+    }
+
+    const supabase = await createServerSupabaseClient();
+    const { data, error } = await supabase
+      .from("student_enrollments")
+      .select("id, class_id, academic_year_id, status")
+      .eq("student_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error || !data) {
+      return null;
+    }
+
+    return data as StudentEnrollment;
   },
 );
 

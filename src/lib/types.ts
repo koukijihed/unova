@@ -15,3 +15,21 @@ export type ProfileNames = {
   lastName: string;
   fullName: string;
 };
+
+export type EnrollmentStatus =
+  | "pending"
+  | "accepted"
+  | "rejected"
+  | "interrupted"
+  | "graduated";
+
+export type StudentProfile = {
+  user_id: string;
+};
+
+export type StudentEnrollment = {
+  id: string;
+  class_id: string;
+  academic_year_id: string;
+  status: EnrollmentStatus;
+};

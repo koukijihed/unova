@@ -1,6 +1,6 @@
 # Statut du projet UNOVA
 
-Dernière mise à jour : 31 octobre 2026
+Dernière mise à jour : 5 novembre 2026
 
 ## Implémenté
 
@@ -21,7 +21,11 @@ Dernière mise à jour : 31 octobre 2026
 - Redirection des utilisateurs connectés depuis `/connexion` et `/inscription` vers le tableau de bord.
 - Chargement du profil (`first_name`, `last_name`) et affichage du nom et des initiales dans la barre supérieure.
 - Menu utilisateur accessible au clavier avec « Mon profil » et « Se déconnecter ».
-- Tableau de bord avec le message « Bonjour, <prénom> » et notice lorsque le compte n'a aucun rôle.
+- Tableau de bord avec le message « Bonjour, <prénom> » et notices d'inscription : aucun profil étudiant (lien vers `/verification`), en attente, acceptée, refusée, interrompue ou terminée.
+- Vérification de l'identité étudiante par CIN sur `/verification` : CIN à 8 chiffres et nom de famille, empreinte HMAC-SHA256 calculée côté serveur, appel à la fonction `claim_roster` et messages d'erreur en français.
+- Client Supabase administrateur réservé au serveur (`src/lib/supabase/admin.ts`) avec `SUPABASE_SECRET_KEY` et `CIN_PEPPER`, jamais exposés au navigateur.
+- Script d'import de la liste officielle (`scripts/import-roster.mjs`) : simulation par défaut, `--apply`, `--skip-invalid`, `--self-test`, contrôle des classes de l'année courante et insertion par lots.
+- Fichiers CSV locaux contenant des CIN exclus du dépôt via `data/` dans `.gitignore`.
 - Formulaires avec validation et messages d'erreur en français, erreurs par champ, état de chargement et bouton désactivé pendant l'envoi.
 - Coquille authentifiée avec barre latérale sur ordinateur, tiroir accessible sur mobile et navigation active.
 - Pages `error.tsx`, `loading.tsx` et 404 en français.
@@ -33,7 +37,8 @@ Dernière mise à jour : 31 octobre 2026
 
 ## Prévu
 
-- Vérification de l'identité étudiante par CIN.
+- Écran d'acceptation des inscriptions par le directeur de parcours.
+- Page d'import de la liste officielle dans l'administration.
 - Affichage et gestion des rôles dans l'interface.
 - Téléversement et affichage de la photo de profil.
 - Recherche fonctionnelle dans l'espace applicatif.
@@ -43,7 +48,8 @@ Dernière mise à jour : 31 octobre 2026
 
 ## Limites actuelles
 
-- Seule l'authentification par e-mail est disponible ; aucune vérification CIN n'est encore proposée.
+- La vérification CIN est disponible, mais l'acceptation des inscriptions par le directeur n'a pas encore d'écran dédié.
+- L'import de la liste officielle se fait uniquement en ligne de commande ; aucune page d'administration n'est encore proposée.
 - L'espace applicatif est protégé, mais ses pages métier restent des pages d'attente.
 - Aucune donnée académique, aucun utilisateur fictif et aucune statistique ne sont affichés.
 - La recherche est volontairement désactivée.

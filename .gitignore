@@ -34,6 +34,9 @@ yarn-error.log*
 .env*
 !.env.example
 
+# données locales (fichiers CSV contenant des CIN en clair)
+data/
+
 # vercel
 .vercel
 
