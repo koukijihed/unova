@@ -7,6 +7,11 @@ export function readText(formData: FormData, key: string): string {
   return typeof value === "string" ? value : "";
 }
 
+export function readCheckbox(formData: FormData, key: string): boolean {
+  const value = formData.get(key);
+  return value === "on" || value === "true";
+}
+
 export function normalizeEmail(value: string): string {
   return value.trim().toLowerCase();
 }

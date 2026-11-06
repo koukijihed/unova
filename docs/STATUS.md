@@ -24,6 +24,8 @@ Dernière mise à jour : 7 novembre 2026
 - Tableau de bord avec le message « Bonjour, <prénom> » et notices d'inscription : aucun profil étudiant (lien vers `/verification`), en attente, acceptée, refusée, interrompue ou terminée.
 - Écran d'acceptation des inscriptions pour les administrateurs et directeurs de programme : `/gestion` et `/gestion/etudiants`, sélection de classe, recherche par nom, compteurs, actions Accepter / Refuser / Remettre en attente (y compris pour les inscriptions acceptées), refus d'une inscription acceptée avec confirmation, et « Tout accepter » avec confirmation.
 - Accès à `/gestion` réservé aux rôles `admin` et `director`, avec entrée « Gestion » affichée uniquement pour ces rôles.
+- Écrans d'administration de la structure académique réservés au rôle `admin` : `/gestion/annees` (création, définition de l'année courante, ouverture et fermeture des inscriptions) et `/gestion/programmes` (création et modification, désactivation sans suppression).
+- Détail d'un programme `/gestion/programmes/[id]` : gestion des parcours, des classes par année universitaire et affectation des directeurs de programme par adresse e-mail.
 - Appels aux fonctions `director_students`, `director_set_enrollment` et `director_accept_all` avec le client Supabase de l'utilisateur connecté ; les permissions restent appliquées par la base de données.
 - Vérification de l'identité étudiante par CIN sur `/verification` : CIN à 8 chiffres et nom de famille, empreinte HMAC-SHA256 calculée côté serveur, appel à la fonction `claim_roster` et messages d'erreur en français.
 - Client Supabase administrateur réservé au serveur (`src/lib/supabase/admin.ts`) avec `SUPABASE_SECRET_KEY` et `CIN_PEPPER`, jamais exposés au navigateur.
@@ -41,21 +43,19 @@ Dernière mise à jour : 7 novembre 2026
 ## Prévu
 
 - Gestion des enseignants.
-- Gestion des programmes et des classes.
-- Gestion des années universitaires.
+- Import et consultation des plans d'études officiels.
 - Page d'import de la liste officielle dans l'administration.
 - Gestion des emplois du temps.
 - Statistiques de gestion.
 - Affichage et gestion des rôles dans l'interface.
 - Téléversement et affichage de la photo de profil.
 - Recherche globale fonctionnelle dans l'en-tête de l'espace applicatif.
-- Import et consultation des données académiques officielles vérifiées.
 - Notifications et communications institutionnelles.
 - Tests automatisés et déploiement.
 
 ## Limites actuelles
 
-- L'acceptation des inscriptions est disponible pour les administrateurs et les directeurs de programme ; les autres outils de gestion restent à venir.
+- L'acceptation des inscriptions est disponible pour les administrateurs et les directeurs de programme ; la structure académique est administrable par les administrateurs, les autres outils de gestion restent à venir.
 - L'import de la liste officielle se fait uniquement en ligne de commande ; aucune page d'administration n'est encore proposée.
 - L'espace applicatif est protégé, mais la plupart de ses pages métier restent des pages d'attente.
 - Aucune donnée académique, aucun utilisateur fictif et aucune statistique ne sont affichés.

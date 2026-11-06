@@ -3,3 +3,7 @@ export function hasManagementRole(
 ): boolean {
   return roles?.some((role) => role === "admin" || role === "director") ?? false;
 }
+
+export function hasAdminRole(roles: string[] | null | undefined): boolean {
+  return roles?.some((role) => role === "admin") ?? false;
+}

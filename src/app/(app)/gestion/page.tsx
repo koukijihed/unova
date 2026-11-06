@@ -1,39 +1,60 @@
 import Link from "next/link";
 import { fr } from "@/content/fr";
+import { hasAdminRole } from "@/lib/auth/roles";
+import { getCurrentRoles } from "@/lib/auth/session";
 
 export const instant = false;
 
 const cards = fr.app.management.cards;
 
-const managementCards = [
-  {
-    title: cards.students.title,
-    description: cards.students.description,
-    href: "/gestion/etudiants",
-  },
-  {
-    title: cards.teachers.title,
-    description: cards.teachers.description,
-  },
-  {
-    title: cards.programs.title,
-    description: cards.programs.description,
-  },
-  {
-    title: cards.academicYears.title,
-    description: cards.academicYears.description,
-  },
-  {
-    title: cards.schedules.title,
-    description: cards.schedules.description,
-  },
-  {
-    title: cards.statistics.title,
-    description: cards.statistics.description,
-  },
-] as const;
+type ManagementCard = {
+  title: string;
+  description: string;
+  href?: string;
+  action?: string;
+};
 
-export default function ManagementPage() {
+export default async function ManagementPage() {
+  const roles = await getCurrentRoles();
+  const isAdmin = hasAdminRole(roles);
+
+  const managementCards: ManagementCard[] = [
+    {
+      title: cards.students.title,
+      description: cards.students.description,
+      href: "/gestion/etudiants",
+      action: cards.students.action,
+    },
+    ...(isAdmin
+      ? [
+          {
+            title: cards.programs.title,
+            description: cards.programs.description,
+            href: "/gestion/programmes",
+            action: cards.programs.action,
+          },
+          {
+            title: cards.academicYears.title,
+            description: cards.academicYears.description,
+            href: "/gestion/annees",
+            action: cards.academicYears.action,
+          },
+        ]
+      : []),
+    {
+      title: cards.teachers.title,
+      description: cards.teachers.description,
+    },
+    {
+      title: cards.schedules.title,
+      description: cards.schedules.description,
+    },
+    {
+      title: cards.statistics.title,
+      description: cards.statistics.description,
+    },
+  ];
+
   return (
     <section className="mx-auto w-full max-w-6xl">
       <p className="text-sm font-semibold tracking-[0.18em] text-primary uppercase">
@@ -59,7 +80,7 @@ export default function ManagementPage() {
         <ul className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {managementCards.map((card) => (
             <li key={card.title}>
-              {"href" in card ? (
+              {card.href ? (
                 <Link
                   href={card.href}
                   className="group flex h-full flex-col rounded-2xl border border-primary/10 bg-white p-5 shadow-sm transition-colors hover:border-accent/50 hover:bg-accent/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
@@ -69,7 +90,7 @@ export default function ManagementPage() {
                       {card.title}
                     </h3>
                     <span className="inline-flex shrink-0 items-center rounded-full bg-primary px-3 py-1 text-xs font-semibold text-white">
-                      {cards.students.action}
+                      {card.action ?? cards.students.action}
                     </span>
                   </div>
                   <p className="mt-3 text-sm leading-6 text-slate-600">

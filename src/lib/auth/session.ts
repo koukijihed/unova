@@ -1,6 +1,7 @@
 import type { User } from "@supabase/supabase-js";
 import { cache } from "react";
 import { redirect } from "next/navigation";
+import { hasAdminRole } from "@/lib/auth/roles";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type {
   Profile,
@@ -126,6 +127,14 @@ export async function redirectIfAuthenticated(): Promise<void> {
   const user = await getCurrentUser();
 
   if (user) {
+    redirect("/tableau-de-bord");
+  }
+}
+
+export async function requireAdmin(): Promise<void> {
+  const roles = await getCurrentRoles();
+
+  if (!hasAdminRole(roles)) {
     redirect("/tableau-de-bord");
   }
 }

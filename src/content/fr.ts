@@ -220,12 +220,14 @@ export const fr = {
         programs: {
           title: "Programmes et classes",
           description:
-            "La gestion des programmes et des classes sera disponible prochainement.",
+            "Gérez les programmes, leurs parcours, leurs classes et leurs directeurs.",
+          action: "Ouvrir",
         },
         academicYears: {
           title: "Années universitaires",
           description:
-            "La gestion des années universitaires sera disponible prochainement.",
+            "Gérez les années universitaires, l'année courante et l'ouverture des inscriptions.",
+          action: "Ouvrir",
         },
         schedules: {
           title: "Emplois du temps",
@@ -327,6 +329,246 @@ export const fr = {
             "Votre session a expiré. Reconnectez-vous pour continuer.",
           generic:
             "L'action n'a pas pu être effectuée. Veuillez réessayer.",
+        },
+      },
+      admin: {
+        backToManagement: "Retour à la gestion",
+        messages: {
+          unique: "Cet élément existe déjà.",
+          forbidden: "Accès refusé.",
+          generic: "Une erreur est survenue. Réessayez.",
+          sessionExpired:
+            "Votre session a expiré. Reconnectez-vous pour continuer.",
+          notFound: "Élément introuvable.",
+          loadFailed: "Impossible de charger les données pour le moment.",
+        },
+        common: {
+          required: "Ce champ est obligatoire.",
+          fixErrors: "Vérifiez les champs indiqués.",
+          save: "Enregistrer",
+          saving: "Enregistrement…",
+          add: "Ajouter",
+          adding: "Ajout…",
+          cancel: "Annuler",
+          close: "Fermer",
+          delete: "Supprimer",
+          deleting: "Suppression…",
+          actions: "Actions",
+          none: "—",
+          optional: "Facultatif",
+        },
+        years: {
+          metadataTitle: "Années universitaires — Gestion — UNOVA",
+          eyebrow: "Structure académique",
+          title: "Années universitaires",
+          description:
+            "Gérez les années universitaires, l'année courante et l'ouverture des inscriptions.",
+          createTitle: "Nouvelle année universitaire",
+          createDescription:
+            "Le libellé doit suivre le format AAAA-AAAA et les deux années doivent se suivre.",
+          listTitle: "Années enregistrées",
+          table: {
+            caption: "Liste des années universitaires",
+            label: "Année",
+            dates: "Dates",
+            status: "Statut",
+            enrollment: "Inscriptions",
+            actions: "Actions",
+          },
+          currentBadge: "Courante",
+          notCurrentBadge: "Non courante",
+          enrollmentOpen: "Inscriptions ouvertes",
+          enrollmentClosed: "Inscriptions fermées",
+          setCurrent: "Définir comme année courante",
+          setCurrentTitle: "Définir l'année courante",
+          setCurrentDescription:
+            "Cette année deviendra l'année courante. Les imports et les nouvelles inscriptions utiliseront cette année.",
+          setCurrentConfirm: "Définir comme courante",
+          openEnrollments: "Ouvrir les inscriptions",
+          closeEnrollments: "Fermer les inscriptions",
+          noYears: "Aucune année universitaire n'est enregistrée.",
+          fields: {
+            label: "Année",
+            labelPlaceholder: "2026-2027",
+            startsOn: "Date de début",
+            endsOn: "Date de fin",
+          },
+          errors: {
+            labelRequired: "L'année est obligatoire.",
+            labelFormat: "Le libellé doit suivre le format AAAA-AAAA.",
+            labelConsecutive:
+              "La seconde année doit être la première plus un.",
+            startsOnRequired: "La date de début est obligatoire.",
+            startsOnInvalid: "Saisissez une date de début valide.",
+            endsOnRequired: "La date de fin est obligatoire.",
+            endsOnInvalid: "Saisissez une date de fin valide.",
+            endsOnAfterStart:
+              "La date de fin doit être postérieure à la date de début.",
+          },
+          success: {
+            created: "L'année universitaire a été créée.",
+            current:
+              "L'année universitaire est maintenant l'année courante.",
+            enrollmentsOpened: "Les inscriptions sont maintenant ouvertes.",
+            enrollmentsClosed: "Les inscriptions sont maintenant fermées.",
+          },
+        },
+        programs: {
+          metadataTitle: "Programmes et classes — Gestion — UNOVA",
+          eyebrow: "Structure académique",
+          title: "Programmes et classes",
+          description:
+            "Gérez les programmes, leurs parcours, leurs classes et leurs directeurs.",
+          createTitle: "Nouveau programme",
+          listTitle: "Programmes",
+          noPrograms: "Aucun programme n'est enregistré.",
+          table: {
+            caption: "Liste des programmes",
+            code: "Code",
+            name: "Nom",
+            degree: "Diplôme",
+            department: "Département",
+            tracks: "Parcours",
+            classes: "Classes",
+            status: "Statut",
+            actions: "Actions",
+          },
+          badges: {
+            active: "Actif",
+            inactive: "Inactif",
+            autoAccept: "Acceptation automatique",
+            coConstructed: "Co-construit",
+          },
+          detail: "Voir le détail",
+          edit: "Modifier",
+          fields: {
+            degreeType: "Diplôme",
+            degreeTypePlaceholder: "Sélectionner un diplôme",
+            code: "Code",
+            codePlaceholder: "Ex. : LIC-INFO",
+            codeHint:
+              "2 à 20 caractères : lettres majuscules, chiffres et tirets. Non modifiable après la création.",
+            name: "Nom",
+            namePlaceholder: "Nom du programme",
+            department: "Département",
+            departmentPlaceholder: "Aucun département",
+            coConstructed: "Co-construit",
+            autoAccept: "Acceptation automatique",
+            autoAcceptHint:
+              "Les étudiants vérifiés sont acceptés sans validation du directeur.",
+            active: "Actif",
+            sourceNote: "Source officielle",
+            sourceNotePlaceholder:
+              "Document, URL et année de la source officielle.",
+            sourceNoteHint:
+              "Document, URL et année de la source officielle.",
+          },
+          errors: {
+            degreeTypeRequired: "Le diplôme est obligatoire.",
+            codeRequired: "Le code est obligatoire.",
+            codeFormat:
+              "Le code doit contenir 2 à 20 caractères : lettres majuscules, chiffres et tirets.",
+            nameRequired: "Le nom est obligatoire.",
+            nameTooLong: "Le nom ne doit pas dépasser 200 caractères.",
+            departmentInvalid:
+              "Le département sélectionné est invalide.",
+            sourceNoteTooLong:
+              "La source officielle ne doit pas dépasser 500 caractères.",
+          },
+          success: {
+            created: "Le programme a été créé.",
+            updated: "Le programme a été mis à jour.",
+          },
+        },
+        programDetail: {
+          metadataTitle: "Détail du programme — Gestion — UNOVA",
+          eyebrow: "Programme",
+          backToPrograms: "Retour aux programmes",
+          degree: "Diplôme",
+          department: "Département",
+          noDepartment: "Aucun département",
+          tracksTitle: "Parcours",
+          tracksDescription:
+            "Les parcours permettent de rattacher les classes à une spécialité du programme.",
+          tracksEmpty: "Aucun parcours n'est enregistré.",
+          addTrackTitle: "Ajouter un parcours",
+          trackName: "Nom du parcours",
+          trackNamePlaceholder: "Ex. : Finance",
+          deleteTrack: "Supprimer",
+          deleteTrackTitle: "Supprimer le parcours",
+          deleteTrackDescription:
+            "Le parcours « {name} » sera supprimé. Les classes qui l'utilisent resteront, sans parcours.",
+          deleteTrackConfirm: "Supprimer le parcours",
+          classesTitle: "Classes",
+          classesDescription:
+            "Les classes sont regroupées par année universitaire.",
+          classesEmpty:
+            "Aucune classe n'est enregistrée pour ce programme.",
+          addClassTitle: "Ajouter une classe",
+          classYear: "Année universitaire",
+          classYearPlaceholder: "Sélectionner une année",
+          classLevel: "Niveau",
+          classLevelPlaceholder: "Sélectionner un niveau",
+          className: "Nom de la classe",
+          classNamePlaceholder: "Ex. : L1 Finance",
+          classTrack: "Parcours",
+          classTrackPlaceholder: "Aucun parcours",
+          deleteClass: "Supprimer",
+          deleteClassTitle: "Supprimer la classe",
+          deleteClassDescription:
+            "La classe « {name} » sera supprimée. Cette action est définitive.",
+          deleteClassConfirm: "Supprimer la classe",
+          classDeleteHasStudents:
+            "Cette classe contient des étudiants et ne peut pas être supprimée.",
+          noYearAvailable:
+            "Aucune année universitaire n'est disponible. Créez d'abord une année.",
+          noLevelAvailable: "Aucun niveau n'est disponible.",
+          directorsTitle: "Directeurs",
+          directorsDescription:
+            "Les directeurs peuvent gérer les inscriptions de ce programme.",
+          directorsEmpty:
+            "Aucun directeur n'est associé à ce programme.",
+          addDirectorTitle: "Ajouter un directeur",
+          directorEmail: "Adresse e-mail du compte",
+          directorEmailPlaceholder: "prenom.nom@exemple.tn",
+          addDirector: "Ajouter le directeur",
+          removeDirector: "Retirer",
+          removeDirectorTitle: "Retirer le directeur",
+          removeDirectorDescription:
+            "Le directeur « {name} » ne sera plus associé à ce programme.",
+          removeDirectorConfirm: "Retirer le directeur",
+          directorNameFallback: "Directeur sans nom",
+        },
+        track: {
+          successAdded: "Le parcours a été ajouté.",
+          successDeleted: "Le parcours a été supprimé.",
+          errors: {
+            nameRequired: "Le nom du parcours est obligatoire.",
+            nameTooLong:
+              "Le nom du parcours ne doit pas dépasser 200 caractères.",
+          },
+        },
+        class: {
+          successAdded: "La classe a été créée.",
+          successDeleted: "La classe a été supprimée.",
+          errors: {
+            yearRequired: "L'année universitaire est obligatoire.",
+            levelRequired: "Le niveau est obligatoire.",
+            nameRequired: "Le nom de la classe est obligatoire.",
+            nameTooLong:
+              "Le nom de la classe ne doit pas dépasser 200 caractères.",
+            trackInvalid: "Le parcours sélectionné est invalide.",
+          },
+        },
+        director: {
+          successAdded: "Directeur ajouté : {name}.",
+          successAddedNoName: "Le directeur a été ajouté.",
+          successRemoved: "Le directeur a été retiré.",
+          errors: {
+            emailRequired: "L'adresse e-mail est obligatoire.",
+            emailInvalid: "Saisissez une adresse e-mail valide.",
+            notFound: "Aucun compte ne correspond à cette adresse.",
+          },
         },
       },
     },
