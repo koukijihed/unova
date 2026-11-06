@@ -1,6 +1,6 @@
 # Statut du projet UNOVA
 
-Dernière mise à jour : 5 novembre 2026
+Dernière mise à jour : 7 novembre 2026
 
 ## Implémenté
 
@@ -22,7 +22,7 @@ Dernière mise à jour : 5 novembre 2026
 - Chargement du profil (`first_name`, `last_name`) et affichage du nom et des initiales dans la barre supérieure.
 - Menu utilisateur accessible au clavier avec « Mon profil » et « Se déconnecter ».
 - Tableau de bord avec le message « Bonjour, <prénom> » et notices d'inscription : aucun profil étudiant (lien vers `/verification`), en attente, acceptée, refusée, interrompue ou terminée.
-- Écran d'acceptation des inscriptions pour les administrateurs et directeurs de programme : `/gestion` et `/gestion/etudiants`, sélection de classe, recherche par nom, compteurs, actions Accepter / Refuser / Remettre en attente et « Tout accepter » avec confirmation.
+- Écran d'acceptation des inscriptions pour les administrateurs et directeurs de programme : `/gestion` et `/gestion/etudiants`, sélection de classe, recherche par nom, compteurs, actions Accepter / Refuser / Remettre en attente (y compris pour les inscriptions acceptées), refus d'une inscription acceptée avec confirmation, et « Tout accepter » avec confirmation.
 - Accès à `/gestion` réservé aux rôles `admin` et `director`, avec entrée « Gestion » affichée uniquement pour ces rôles.
 - Appels aux fonctions `director_students`, `director_set_enrollment` et `director_accept_all` avec le client Supabase de l'utilisateur connecté ; les permissions restent appliquées par la base de données.
 - Vérification de l'identité étudiante par CIN sur `/verification` : CIN à 8 chiffres et nom de famille, empreinte HMAC-SHA256 calculée côté serveur, appel à la fonction `claim_roster` et messages d'erreur en français.

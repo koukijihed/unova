@@ -301,6 +301,13 @@ export const fr = {
             "{count} inscriptions en attente seront acceptées.",
           acceptAllConfirm: "Confirmer",
           acceptAllCancel: "Annuler",
+          rejectTitle: "Refuser l'inscription",
+          rejectDescription:
+            "{name} perdra l'accès aux contenus de la classe.",
+          rejectHint:
+            "Vous pourrez remettre cette inscription en attente si nécessaire.",
+          rejectConfirm: "Confirmer le refus",
+          rejectCancel: "Annuler",
           processing: "Traitement…",
           acceptAllDisabled: "Aucune inscription en attente.",
           noActions: "Aucune action disponible",
