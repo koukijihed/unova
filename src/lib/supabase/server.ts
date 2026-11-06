@@ -1,7 +1,13 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { connection } from "next/server";
 
 export async function createServerSupabaseClient() {
+  // Supabase lit l'heure système (Date.now) dès la création du client.
+  // Sans cet appel, Next.js tente de prérendre la route et échoue sur
+  // « unstable value Date.now() ». On force donc un rendu à la requête.
+  await connection();
+
   const cookieStore = await cookies();
 
   return createServerClient(
