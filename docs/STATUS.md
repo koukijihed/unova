@@ -41,7 +41,8 @@ Dernière mise à jour : 7 novembre 2026
 - Règles permanentes documentées dans `AGENTS.md`.
 - Configuration de déploiement Cloudflare Workers avec `@opennextjs/cloudflare` : `wrangler.jsonc` (Worker `unova`, `nodejs_compat`, actifs statiques, bindings), `open-next.config.ts`, scripts `preview`, `deploy`, `upload` et `cf-typegen`, en-têtes de cache des actifs statiques.
 - Build de l'adaptateur Cloudflare vérifié et bundle mesuré : 8,92 Mio non compressé, 1,94 Mio gzip (limite Workers de 64 Mio non compressés).
-- Guide de déploiement en français dans `docs/DEPLOIEMENT.md` (prérequis, variables publiques et secrètes, commandes, retour arrière).
+- Prévisualisation Cloudflare (`npm run preview`) fonctionnelle : Cache Components désactivé pour contourner un défaut amont d'OpenNext ; `/`, `/connexion`, `/inscription` et `/mot-de-passe-oublie` répondent 200, et les routes protégées redirigent vers `/connexion?redirection=...`.
+- Guide de déploiement en français dans `docs/DEPLOIEMENT.md` (prérequis, variables publiques et secrètes, commandes, retour arrière, décision Cache Components).
 
 ## Prévu
 
@@ -55,7 +56,7 @@ Dernière mise à jour : 7 novembre 2026
 - Recherche globale fonctionnelle dans l'en-tête de l'espace applicatif.
 - Notifications et communications institutionnelles.
 - Tests automatisés.
-- Déploiement effectif sur Cloudflare Workers après publication du correctif Cache Components de l'adaptateur OpenNext.
+- Réactivation de Cache Components et déploiement effectif sur Cloudflare Workers après publication du correctif de l'adaptateur OpenNext (PR #1318).
 
 ## Limites actuelles
 
@@ -64,6 +65,6 @@ Dernière mise à jour : 7 novembre 2026
 - L'espace applicatif est protégé, mais la plupart de ses pages métier restent des pages d'attente.
 - Aucune donnée académique, aucun utilisateur fictif et aucune statistique ne sont affichés.
 - La recherche globale de l'en-tête est volontairement désactivée ; la recherche par nom est disponible dans la gestion des étudiants.
-- Le déploiement Cloudflare est configuré mais non opérationnel : avec `cacheComponents`, Next.js 16.4.5 et `@opennextjs/cloudflare` 1.20.16, les routes dynamiques bloquent dans workerd (erreur « Worker's code had hung »). Le correctif amont (PR #1318) n'est pas encore publié ; les actifs statiques fonctionnent.
+- Le déploiement Cloudflare est configuré et la prévisualisation locale fonctionne, mais Cache Components reste désactivé : avec Next.js 16.4.5 et `@opennextjs/cloudflare` 1.20.16, l'activer fait bloquer les routes dynamiques dans workerd (erreur « Worker's code had hung »). Le correctif amont (PR #1318) n'est pas encore publié. Voir `docs/DEPLOIEMENT.md`, section 10.
 - Aucun déploiement Cloudflare n'a été effectué : Wrangler n'est pas authentifié sur cette machine et aucun secret de production n'a été créé.
 - Le cache incrémental R2 n'est pas activé ; le guide décrit son activation optionnelle.

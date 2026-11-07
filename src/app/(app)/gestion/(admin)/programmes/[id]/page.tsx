@@ -21,8 +21,6 @@ import {
   removeDirector,
 } from "@/lib/management/program-actions";
 
-export const instant = false;
-
 type PageProps = {
   params: Promise<{ id: string }>;
 };

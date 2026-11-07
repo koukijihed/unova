@@ -5,8 +5,6 @@ import { ResetPasswordForm } from "@/components/auth/reset-password-form";
 import { fr } from "@/content/fr";
 import { getCurrentUser } from "@/lib/auth/session";
 
-export const instant = false;
-
 export const metadata: Metadata = {
   title: fr.auth.reset.metadataTitle,
 };

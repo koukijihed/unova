@@ -3,8 +3,6 @@ import { redirect } from "next/navigation";
 import { hasManagementRole } from "@/lib/auth/roles";
 import { getCurrentRoles, getCurrentUser } from "@/lib/auth/session";
 
-export const instant = false;
-
 export default async function ManagementLayout({
   children,
 }: {

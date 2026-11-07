@@ -8,8 +8,6 @@ import {
   getPrograms,
 } from "@/lib/management/admin-data";
 
-export const instant = false;
-
 export const metadata = {
   title: fr.app.management.admin.programs.metadataTitle,
 };

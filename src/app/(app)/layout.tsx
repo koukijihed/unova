@@ -9,8 +9,6 @@ import {
   getProfileNames,
 } from "@/lib/auth/session";
 
-export const instant = false;
-
 export default async function AppLayout({
   children,
 }: {

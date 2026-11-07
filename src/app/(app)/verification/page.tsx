@@ -7,8 +7,6 @@ import {
   getCurrentUser,
 } from "@/lib/auth/session";
 
-export const instant = false;
-
 export const metadata: Metadata = {
   title: fr.app.verification.metadataTitle,
 };

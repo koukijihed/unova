@@ -3,8 +3,6 @@ import { fr } from "@/content/fr";
 import { hasAdminRole } from "@/lib/auth/roles";
 import { getCurrentRoles } from "@/lib/auth/session";
 
-export const instant = false;
-
 const cards = fr.app.management.cards;
 
 type ManagementCard = {

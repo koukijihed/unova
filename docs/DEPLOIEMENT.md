@@ -8,14 +8,11 @@ d'environnement et la procédure de retour arrière.
 
 ## Statut actuel
 
-La configuration est prête et le build de l'adaptateur réussit. **La
-prévisualisation locale dans workerd est toutefois bloquée par un défaut
-amont** : les routes dynamiques retournent une erreur 500 car le Worker est
-déclaré « hung ». Voir la section
-[Limitation connue (bloquante)](#limitation-connue-bloquante).
-
-**Ne pas déployer en production tant que ce défaut n'est pas corrigé dans une
-version publiée de `@opennextjs/cloudflare`.**
+La configuration est prête, le build de l'adaptateur réussit et la
+prévisualisation locale dans workerd fonctionne. Pour contourner le défaut
+amont qui bloquait les routes dynamiques, **Cache Components est désactivé**
+dans `next.config.ts`. Voir la section
+[Cache Components et compatibilité Cloudflare](#10-cache-components-et-compatibilité-cloudflare).
 
 ## 1. Prérequis
 
@@ -35,7 +32,7 @@ version publiée de `@opennextjs/cloudflare`.**
 | --- | --- |
 | `wrangler.jsonc` | Worker `unova`, date de compatibilité, `nodejs_compat`, actifs statiques, binding d'auto-référence et binding Images. Aucun secret. |
 | `open-next.config.ts` | Configuration de l'adaptateur. Le cache incrémental R2 est désactivé (ligne commentée). |
-| `next.config.ts` | Configuration Next.js, dont `cacheComponents` et l'initialisation d'OpenNext pour `next dev`. |
+| `next.config.ts` | Configuration Next.js, dont l'initialisation d'OpenNext pour `next dev`. Cache Components est désactivé (voir section 10). |
 | `public/_headers` | En-têtes de cache longs pour `/_next/static/*`. |
 | `cloudflare-env.d.ts` | Types générés localement par `npm run cf-typegen` (ignoré par Git) ; à régénérer après toute modification des bindings. |
 | `src/proxy.ts` | Rafraîchissement de session Supabase. Le middleware Node.js est **expérimental** dans l'adaptateur Cloudflare. |
@@ -125,18 +122,23 @@ Routes à vérifier :
 - `/` : page d'accueil.
 - `/connexion` : formulaire de connexion.
 - `/inscription` : formulaire d'inscription.
-- `/tableau-de-bord` : doit rediriger un visiteur non connecté vers
-  `/connexion?redirection=...`.
+- `/mot-de-passe-oublie` : demande de réinitialisation.
+- `/tableau-de-bord`, `/gestion`, `/verification` : doivent rediriger un
+  visiteur non connecté vers `/connexion?redirection=...`.
 
-État mesuré le 7 novembre 2026 :
+État mesuré le 7 novembre 2026, avec Cache Components désactivé :
 
-- Les actifs statiques (`/file.svg`, `/_next/static/...`) répondent **200**.
-- Les routes dynamiques répondent **500** et le runtime signale :
-  `The Workers runtime canceled this request because it detected that your
-  Worker's code had hung and would never generate a response.`
-- Le journal contient aussi l'avertissement :
-  `Next.js cannot guarantee that Cache Components will run as expected due to
-  the current runtime's implementation of setTimeout()`.
+- `/`, `/connexion`, `/inscription` et `/mot-de-passe-oublie` répondent
+  **200**.
+- `/tableau-de-bord`, `/gestion` et `/verification` répondent **200** avec une
+  redirection de streaming Next.js (`<meta http-equiv="refresh">` et
+  `NEXT_REDIRECT`) vers respectivement
+  `/connexion?redirection=%2Ftableau-de-bord`,
+  `/connexion?redirection=%2Fgestion` et
+  `/connexion?redirection=%2Fverification`. Ce n'est pas un code 307 : sans
+  Cache Components, Next.js diffuse la page puis redirige côté client.
+- Aucune erreur « Worker's code had hung » ni erreur 500 dans le journal
+  Wrangler.
 
 ## 6. Vérifications avant déploiement
 
@@ -231,33 +233,55 @@ Le tableau de bord permet aussi de revenir à un déploiement antérieur depuis
 Un retour arrière ne restaure pas les valeurs de secrets : si un secret a été
 modifié ou supprimé, il faut le recréer avec `wrangler secret put`.
 
-## 10. Limitation connue (bloquante)
+## 10. Cache Components et compatibilité Cloudflare
 
-Avec la combinaison actuelle :
+### Décision
 
-- Next.js **16.4.5** avec `cacheComponents: true`,
-- `@opennextjs/cloudflare` **1.20.16**,
+Cache Components (`cacheComponents`) et le préchargement partiel
+(`partialPrefetching`) sont **désactivés** dans `next.config.ts`. Les 14
+exports `export const instant = false;` ont été retirés : cet export n'est
+valide que lorsque `cacheComponents` est activé, et `partialPrefetching`
+dépend lui aussi de `cacheComponents`.
 
-les routes dynamiques bloquent dans workerd et retournent une erreur 500
-« Worker's code had hung ». Le correctif amont est la pull request
-[opennextjs/opennextjs-cloudflare#1318](https://github.com/opennextjs/opennextjs-cloudflare/pull/1318),
-**non publiée** au 7 novembre 2026 (le tag npm `latest` reste 1.20.16).
+Cette désactivation est un contournement, pas un choix de conception.
+
+### Raison
+
+Avec Next.js **16.4.5** et `@opennextjs/cloudflare` **1.20.16**, activer
+`cacheComponents` provoque dans workerd le blocage des routes dynamiques :
+le runtime annule la requête et répond une erreur 500
+« The Workers runtime canceled this request because it detected that your
+Worker's code had hung and would never generate a response. » Le journal
+affiche aussi l'avertissement :
+
+`Next.js cannot guarantee that Cache Components will run as expected due to
+the current runtime's implementation of setTimeout()`.
 
 Le problème a été isolé :
 
 - il persiste avec `src/proxy.ts` désactivé ;
 - il n'affecte pas les actifs statiques ;
-- il est cohérent avec l'avertissement Cache Components / `setTimeout()` ;
-- l'application dépend de `cacheComponents` (`export const instant = false`
-  dans plusieurs routes), donc désactiver l'option n'est pas une solution
-  neutre.
+- il disparaît dès que `cacheComponents` est désactivé.
 
-Actions à prévoir :
+Les routes restent dynamiques grâce à `await connection()` dans
+`src/lib/supabase/server.ts` ; aucun `export const dynamic` ni `<Suspense>`
+supplémentaire n'a été nécessaire.
 
-1. Surveiller les versions de `@opennextjs/cloudflare` et mettre à jour dès
-   qu'une version inclut le correctif.
-2. Relancer `npm run preview` et vérifier les quatre routes ci-dessus.
-3. Ne déployer en production qu'après un test local concluant.
+### Réactivation
+
+Le correctif amont est la pull request
+[opennextjs/opennextjs-cloudflare#1318](https://github.com/opennextjs/opennextjs-cloudflare/pull/1318),
+**non publiée** au 7 novembre 2026 (le tag npm `latest` reste 1.20.16).
+
+Pour réactiver Cache Components :
+
+1. Mettre à jour `@opennextjs/cloudflare` vers une version incluant le
+   correctif.
+2. Rétablir `cacheComponents: true` et `partialPrefetching: true` dans
+   `next.config.ts`, puis restaurer les exports `instant` nécessaires.
+3. Relancer `npm run lint`, `npm run build`, `npx opennextjs-cloudflare build`
+   et `npm run preview`, puis vérifier les routes de la section 5.
+4. Ne déployer en production qu'après un test local concluant.
 
 ## 11. Sécurité
 

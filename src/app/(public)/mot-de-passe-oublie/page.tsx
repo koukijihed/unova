@@ -4,8 +4,6 @@ import { AuthCard } from "@/components/auth-card";
 import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
 import { fr } from "@/content/fr";
 
-export const instant = false;
-
 export const metadata: Metadata = {
   title: fr.auth.forgot.metadataTitle,
 };

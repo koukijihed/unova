@@ -12,8 +12,6 @@ import {
 } from "@/lib/auth/session";
 import type { EnrollmentStatus } from "@/lib/types";
 
-export const instant = false;
-
 function getEnrollmentNotice(status: EnrollmentStatus) {
   switch (status) {
     case "pending":

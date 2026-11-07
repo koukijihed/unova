@@ -6,8 +6,6 @@ import { fr } from "@/content/fr";
 import { getAcademicYears } from "@/lib/management/admin-data";
 import { formatDateFr } from "@/lib/management/format";
 
-export const instant = false;
-
 export const metadata = {
   title: fr.app.management.admin.years.metadataTitle,
 };

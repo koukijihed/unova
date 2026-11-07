@@ -6,8 +6,6 @@ import { fr } from "@/content/fr";
 import { getClassStudents, getManagementClasses } from "@/lib/management/data";
 import type { ManagementStudent } from "@/lib/types";
 
-export const instant = false;
-
 export const metadata = {
   title: fr.app.management.students.metadataTitle,
 };
