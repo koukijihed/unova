@@ -109,10 +109,12 @@ export function AppShell({
   children,
   profile,
   canManage,
+  avatarUrl,
 }: {
   children: React.ReactNode;
   profile: ProfileNames;
   canManage: boolean;
+  avatarUrl: string | null;
 }) {
   const pathname = usePathname();
   const navItems = fr.app.nav.items.filter(
@@ -209,7 +211,7 @@ export function AppShell({
           </div>
 
           <div className="ml-auto flex items-center gap-3">
-            <UserMenu profile={profile} />
+            <UserMenu profile={profile} avatarUrl={avatarUrl} />
           </div>
         </header>
 

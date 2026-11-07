@@ -8,6 +8,7 @@ import {
   getCurrentUser,
   getProfileNames,
 } from "@/lib/auth/session";
+import { getSignedAvatarUrl } from "@/lib/profile/avatar";
 
 export default async function AppLayout({
   children,
@@ -30,9 +31,14 @@ export default async function AppLayout({
     getCurrentRoles(),
   ]);
   const profileNames = getProfileNames(profile, user);
+  const avatarUrl = await getSignedAvatarUrl(profile?.avatar_path);
 
   return (
-    <AppShell profile={profileNames} canManage={hasManagementRole(roles)}>
+    <AppShell
+      profile={profileNames}
+      canManage={hasManagementRole(roles)}
+      avatarUrl={avatarUrl}
+    >
       {children}
     </AppShell>
   );

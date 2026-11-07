@@ -19,7 +19,7 @@ export function PublicHeader() {
             {fr.publicNav.home}
           </Link>
           <Link
-            href="/#formations"
+            href="/formations"
             className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-primary/5 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
             {fr.publicNav.programs}

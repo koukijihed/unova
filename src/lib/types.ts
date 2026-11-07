@@ -2,8 +2,10 @@ export type Profile = {
   id: string;
   first_name: string;
   last_name: string;
+  phone: string | null;
   avatar_path: string | null;
   status: "active" | "suspended";
+  created_at: string;
 };
 
 export type UserRole = {

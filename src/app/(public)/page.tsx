@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { Notice } from "@/components/notice";
 import { fr } from "@/content/fr";
+import { getActiveProgramCounts } from "@/lib/catalogue/data";
 
 function ArrowRightIcon() {
   return (
@@ -15,45 +17,10 @@ function ArrowRightIcon() {
   );
 }
 
-function AcademicIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="size-5">
-      <path
-        d="m3 9 9-4 9 4-9 4-9-4Z"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M7 11.5V16c2.7 1.7 7.3 1.7 10 0v-4.5"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
+export default async function HomePage() {
+  const counts = await getActiveProgramCounts();
+  const formationsLabels = fr.home.formations;
 
-function ManagementIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="size-5">
-      <path
-        d="M4 20V6.5L12 3l8 3.5V20"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M9 20v-5h6v5M8 9h.01M12 9h.01M16 9h.01M8 12h.01M12 12h.01M16 12h.01"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-export default function HomePage() {
   return (
     <>
       <section className="relative overflow-hidden">
@@ -144,58 +111,55 @@ export default function HomePage() {
         <div className="mx-auto w-full max-w-6xl px-6">
           <div className="max-w-2xl">
             <p className="text-sm font-semibold tracking-[0.18em] text-primary uppercase">
-              {fr.home.spacesEyebrow}
+              {formationsLabels.eyebrow}
             </p>
             <h2 className="mt-3 text-2xl font-bold tracking-tight text-primary sm:text-3xl">
-              {fr.home.spacesTitle}
+              {formationsLabels.title}
             </h2>
-            <p className="mt-3 text-slate-600">{fr.home.spacesDescription}</p>
+            <p className="mt-3 text-slate-600">
+              {formationsLabels.description}
+            </p>
           </div>
 
-          <div className="mt-10 grid gap-5 md:grid-cols-2">
-            <article className="rounded-2xl border border-primary/10 bg-background p-6 transition-colors hover:border-accent/40 sm:p-8">
-              <div className="flex size-11 items-center justify-center rounded-xl bg-primary text-white">
-                <AcademicIcon />
-              </div>
-              <h3 className="mt-5 text-xl font-semibold text-primary">
-                {fr.home.academic.title}
-              </h3>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
-                {fr.home.academic.description}
-              </p>
-              <ul className="mt-5 flex flex-wrap gap-2">
-                {fr.home.academic.items.map((item) => (
-                  <li
-                    key={item}
-                    className="rounded-full border border-primary/10 bg-white px-3 py-1 text-xs font-medium text-slate-600"
+          {counts.error ? (
+            <Notice tone="error">{formationsLabels.loadFailed}</Notice>
+          ) : counts.items.length === 0 ? (
+            <p className="mt-8 rounded-2xl border border-primary/10 bg-background px-5 py-6 text-sm leading-6 text-slate-600">
+              {formationsLabels.empty}
+            </p>
+          ) : (
+            <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {counts.items.map((item) => (
+                <li key={item.code}>
+                  <Link
+                    href="/formations"
+                    className="flex h-full flex-col justify-between rounded-2xl border border-primary/10 bg-background p-6 transition-colors hover:border-accent/40 hover:bg-accent/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                   >
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </article>
+                    <p className="text-base font-semibold text-primary">
+                      {item.label}
+                    </p>
+                    <p className="mt-4 text-sm text-slate-600">
+                      {item.count === 1
+                        ? formationsLabels.countOne
+                        : formationsLabels.countMany.replace(
+                            "{count}",
+                            String(item.count),
+                          )}
+                    </p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
 
-            <article className="rounded-2xl border border-primary/10 bg-background p-6 transition-colors hover:border-accent/40 sm:p-8">
-              <div className="flex size-11 items-center justify-center rounded-xl bg-primary text-white">
-                <ManagementIcon />
-              </div>
-              <h3 className="mt-5 text-xl font-semibold text-primary">
-                {fr.home.management.title}
-              </h3>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
-                {fr.home.management.description}
-              </p>
-              <ul className="mt-5 flex flex-wrap gap-2">
-                {fr.home.management.items.map((item) => (
-                  <li
-                    key={item}
-                    className="rounded-full border border-primary/10 bg-white px-3 py-1 text-xs font-medium text-slate-600"
-                  >
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </article>
+          <div className="mt-8">
+            <Link
+              href="/formations"
+              className="inline-flex items-center gap-2 rounded-xl border border-primary/15 bg-white px-5 py-3 text-sm font-semibold text-primary transition-colors hover:border-accent/40 hover:bg-accent/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              {formationsLabels.cta}
+              <ArrowRightIcon />
+            </Link>
           </div>
         </div>
       </section>

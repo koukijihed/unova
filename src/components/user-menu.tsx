@@ -21,7 +21,13 @@ function ChevronIcon() {
   );
 }
 
-export function UserMenu({ profile }: { profile: ProfileNames }) {
+export function UserMenu({
+  profile,
+  avatarUrl,
+}: {
+  profile: ProfileNames;
+  avatarUrl: string | null;
+}) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -99,7 +105,10 @@ export function UserMenu({ profile }: { profile: ProfileNames }) {
         aria-controls="user-account-menu"
         className="flex items-center gap-2 rounded-full border border-transparent p-0.5 pr-1.5 transition-colors hover:bg-primary/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
       >
-        <Avatar name={profile.fullName || undefined} />
+        <Avatar
+          name={profile.fullName || undefined}
+          src={avatarUrl ?? undefined}
+        />
         <span className="hidden max-w-40 truncate text-sm font-medium text-primary sm:block">
           {displayName}
         </span>
@@ -117,9 +126,15 @@ export function UserMenu({ profile }: { profile: ProfileNames }) {
           onKeyDown={handleMenuKeyDown}
           className="absolute top-full right-0 z-40 mt-2 w-60 rounded-2xl border border-primary/10 bg-white p-2 shadow-xl shadow-primary/10"
         >
-          <p className="truncate px-3 py-2 text-xs font-semibold tracking-wide text-slate-600 uppercase">
-            {displayName}
-          </p>
+          <div className="flex items-center gap-3 px-3 py-2">
+            <Avatar
+              name={profile.fullName || undefined}
+              src={avatarUrl ?? undefined}
+            />
+            <p className="truncate text-xs font-semibold tracking-wide text-slate-600 uppercase">
+              {displayName}
+            </p>
+          </div>
 
           <Link
             href="/profil"

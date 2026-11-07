@@ -32,7 +32,9 @@ export const getCurrentProfile = cache(async (): Promise<Profile | null> => {
   const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, first_name, last_name, avatar_path, status")
+    .select(
+      "id, first_name, last_name, phone, avatar_path, status, created_at",
+    )
     .eq("id", user.id)
     .maybeSingle();
 

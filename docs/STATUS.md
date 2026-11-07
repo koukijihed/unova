@@ -10,7 +10,7 @@ Dernière mise à jour : 7 novembre 2026
 - Coquille publique avec en-tête (logo UNOVA, Accueil, Formations, Connexion) et pied de page ESSECT.
 - Logo UNOVA intégré avec `next/image` dans l'en-tête, le pied de page, la barre latérale et au-dessus des formulaires d'authentification.
 - Favicon et icône Apple générés depuis le logo (`src/app/icon.png`, `src/app/apple-icon.png`), favicon par défaut supprimé.
-- Page d'accueil avec slogan, présentation, cartes UNOVA Académique et UNOVA Gestion, et boutons d'action.
+- Page d'accueil avec slogan, présentation, boutons d'action et section « Nos formations » alimentée par le nombre réel de programmes actifs par diplôme, avec liens vers `/formations`.
 - Connexion Supabase avec `@supabase/supabase-js` et `@supabase/ssr` (clé publique uniquement).
 - Authentification par e-mail et mot de passe : inscription, connexion, déconnexion.
 - Confirmation d'adresse par e-mail via la route `/auth/callback`.
@@ -19,8 +19,16 @@ Dernière mise à jour : 7 novembre 2026
 - Routes de l'espace applicatif protégées côté serveur avec `supabase.auth.getUser()`.
 - Redirection des utilisateurs non connectés vers `/connexion?redirection=<chemin>`.
 - Redirection des utilisateurs connectés depuis `/connexion` et `/inscription` vers le tableau de bord.
-- Chargement du profil (`first_name`, `last_name`) et affichage du nom et des initiales dans la barre supérieure.
+- Chargement du profil (`first_name`, `last_name`, `phone`, `avatar_path`, `created_at`) et affichage du nom, des initiales et de la photo dans la barre supérieure et le menu utilisateur.
 - Menu utilisateur accessible au clavier avec « Mon profil » et « Se déconnecter ».
+- Page `/profil` : en-tête avec photo, nom complet, rôles (`roles.label_fr`), date de création du compte et adresse e-mail ; inscription(s) étudiante(s) en lecture seule (classe, programme, année, statut en français).
+- Modification du prénom, du nom (obligatoires, 80 caractères maximum) et du téléphone (facultatif, 20 caractères maximum, chiffres, espaces et `+`) via une action serveur avec erreurs en français.
+- Photo de profil : téléversement PNG/JPEG/WebP (2 Mo maximum), type réel vérifié par signature binaire, stockage dans `<user_id>/<uuid>.<ext>`, suppression de l'ancien objet et action « Supprimer la photo ». Affichage par URL signée d'une heure avec repli sur les initiales.
+- Changement de mot de passe depuis `/profil` (10 caractères minimum, confirmation) via `supabase.auth.updateUser`.
+- Catalogue des formations partagé entre les routes publiques `/formations`, `/formations/[code]` et les routes authentifiées `/programmes`, `/programmes/[code]` : regroupement par diplôme selon `sort_order`, groupes vides masqués, recherche `?q=` insensible aux accents, cartes (nom, département, badge « Co-construit », parcours).
+- Détail d'une formation : diplôme, département, parcours et note « Le plan d'études détaillé sera publié prochainement. ». Les administrateurs voient aussi les programmes inactifs (badge « Inactif ») et leur `source_note`.
+- Hub `/academique` listant les modules (Programmes, Cours, Documents, Vidéos, Emplois du temps, Questions-Réponses) avec les badges « Disponible » et « Bientôt disponible ».
+- Bloc « Accès rapide » sur le tableau de bord vers Profil, Programmes et, pour les rôles `admin` et `director`, Gestion.
 - Tableau de bord avec le message « Bonjour, <prénom> » et notices d'inscription : aucun profil étudiant (lien vers `/verification`), en attente, acceptée, refusée, interrompue ou terminée.
 - Écran d'acceptation des inscriptions pour les administrateurs et directeurs de programme : `/gestion` et `/gestion/etudiants`, sélection de classe, recherche par nom, compteurs, actions Accepter / Refuser / Remettre en attente (y compris pour les inscriptions acceptées), refus d'une inscription acceptée avec confirmation, et « Tout accepter » avec confirmation.
 - Accès à `/gestion` réservé aux rôles `admin` et `director`, avec entrée « Gestion » affichée uniquement pour ces rôles.
@@ -50,10 +58,13 @@ Dernière mise à jour : 7 novembre 2026
 - Gestion des enseignants.
 - Import et consultation des plans d'études officiels.
 - Page d'import de la liste officielle dans l'administration.
-- Gestion des emplois du temps.
+- Cours et supports pédagogiques.
+- Documents administratifs et académiques.
+- Vidéos pédagogiques.
+- Emplois du temps.
+- Questions-Réponses.
 - Statistiques de gestion.
 - Affichage et gestion des rôles dans l'interface.
-- Téléversement et affichage de la photo de profil.
 - Recherche globale fonctionnelle dans l'en-tête de l'espace applicatif.
 - Notifications et communications institutionnelles.
 - Tests automatisés.

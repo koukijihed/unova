@@ -11,6 +11,7 @@ export const fr = {
     comingSoon: "Bientôt disponible",
     loading: "Chargement…",
     retry: "Réessayer",
+    notAvailable: "—",
   },
   brand: {
     logoAlt: "Logo UNOVA",
@@ -49,6 +50,150 @@ export const fr = {
       description:
         "Un espace dédié aux étudiants, aux enseignants, aux programmes et aux années universitaires.",
       items: ["Étudiants", "Enseignants", "Programmes", "Années universitaires"],
+    },
+    formations: {
+      eyebrow: "Catalogue des formations",
+      title: "Nos formations",
+      description:
+        "Découvrez les programmes actifs de l'ESSECT, regroupés par diplôme.",
+      empty: "Le catalogue des formations sera publié prochainement.",
+      loadFailed:
+        "Impossible de charger le catalogue des formations pour le moment.",
+      countOne: "1 programme actif",
+      countMany: "{count} programmes actifs",
+      cta: "Voir toutes les formations",
+    },
+  },
+  catalogue: {
+    metadataTitle: "Formations — UNOVA",
+    detailMetadataTitle: "Formation — UNOVA",
+    detailDescription: "Détail d'une formation officielle de l'ESSECT.",
+    eyebrow: "Catalogue des formations",
+    title: "Formations",
+    description:
+      "Découvrez les programmes de formation officiels de l'ESSECT, regroupés par diplôme.",
+    authenticatedEyebrow: "Catalogue des programmes",
+    authenticatedTitle: "Programmes",
+    authenticatedDescription:
+      "Consultez les programmes de formation de l'ESSECT et leurs parcours.",
+    searchLabel: "Rechercher une formation",
+    searchPlaceholder: "Nom, code, département ou parcours",
+    searchSubmit: "Rechercher",
+    clearSearch: "Effacer la recherche",
+    resultsCountOne: "1 formation trouvée",
+    resultsCountMany: "{count} formations trouvées",
+    noResults: "Aucune formation ne correspond à votre recherche.",
+    empty: "Aucune formation n'est publiée pour le moment.",
+    loadFailed: "Impossible de charger les formations pour le moment.",
+    coConstructed: "Co-construit",
+    inactive: "Inactif",
+    tracksTitle: "Parcours",
+    noTracks: "Aucun parcours renseigné.",
+    degreeLabel: "Diplôme",
+    departmentLabel: "Département",
+    sourceNote: "Source officielle",
+    planNote: "Le plan d'études détaillé sera publié prochainement.",
+    back: "Retour aux formations",
+    backPrograms: "Retour aux programmes",
+  },
+  profile: {
+    metadataTitle: "Profil — UNOVA",
+    eyebrow: "Mon compte",
+    title: "Profil",
+    description:
+      "Gérez vos informations personnelles, votre photo et votre mot de passe.",
+    header: {
+      emailLabel: "Adresse e-mail",
+      rolesLabel: "Rôles",
+      noRoles: "Aucun rôle n'est attribué à votre compte.",
+      memberSince: "Compte créé le {date}",
+      memberSinceLabel: "Date de création du compte",
+    },
+    enrollments: {
+      title: "Mon parcours",
+      description: "Vos inscriptions et leur statut.",
+      empty: "Aucune inscription n'est enregistrée pour votre compte.",
+      loadFailed: "Impossible de charger vos inscriptions pour le moment.",
+      classLabel: "Classe",
+      programLabel: "Programme",
+      yearLabel: "Année universitaire",
+      statusLabel: "Statut",
+      unavailable: "Non communiqué",
+      statuses: {
+        pending: "En attente",
+        accepted: "Accepté",
+        rejected: "Refusé",
+        interrupted: "Études interrompues",
+        graduated: "Diplômé",
+      },
+    },
+    personal: {
+      title: "Informations personnelles",
+      description:
+        "Mettez à jour votre prénom, votre nom et votre numéro de téléphone.",
+      firstNameLabel: "Prénom",
+      lastNameLabel: "Nom",
+      phoneLabel: "Téléphone",
+      phonePlaceholder: "Ex. : +216 12 345 678",
+      phoneHint:
+        "Facultatif. Chiffres, espaces et signe + uniquement, 20 caractères maximum.",
+      submit: "Enregistrer",
+      submitting: "Enregistrement…",
+      success: "Vos informations ont été mises à jour.",
+    },
+    avatar: {
+      title: "Photo de profil",
+      description: "Formats acceptés : PNG, JPEG ou WebP, 2 Mo maximum.",
+      choose: "Choisir une photo",
+      submit: "Mettre à jour la photo",
+      submitting: "Envoi…",
+      delete: "Supprimer la photo",
+      deleting: "Suppression…",
+      success: "Votre photo de profil a été mise à jour.",
+      deleted: "Votre photo de profil a été supprimée.",
+      noPhoto: "Aucune photo de profil n'est enregistrée.",
+      errors: {
+        required: "Sélectionnez une image.",
+        tooLarge: "L'image ne doit pas dépasser 2 Mo.",
+        invalidType: "Le fichier doit être une image PNG, JPEG ou WebP.",
+        uploadFailed:
+          "Impossible d'enregistrer la photo. Veuillez réessayer.",
+        deleteFailed:
+          "Impossible de supprimer la photo. Veuillez réessayer.",
+      },
+    },
+    password: {
+      title: "Mot de passe",
+      description:
+        "Choisissez un nouveau mot de passe de 10 caractères minimum.",
+      newPasswordLabel: "Nouveau mot de passe",
+      newPasswordPlaceholder: "Votre nouveau mot de passe",
+      confirmationLabel: "Confirmation du mot de passe",
+      confirmationPlaceholder: "Confirmez votre nouveau mot de passe",
+      submit: "Mettre à jour le mot de passe",
+      submitting: "Mise à jour…",
+      success: "Votre mot de passe a été mis à jour.",
+    },
+    errors: {
+      fixErrors: "Vérifiez les champs indiqués.",
+      firstNameRequired: "Le prénom est obligatoire.",
+      firstNameTooLong: "Le prénom ne doit pas dépasser 80 caractères.",
+      lastNameRequired: "Le nom est obligatoire.",
+      lastNameTooLong: "Le nom ne doit pas dépasser 80 caractères.",
+      phoneTooLong: "Le téléphone ne doit pas dépasser 20 caractères.",
+      phoneInvalid:
+        "Le téléphone ne peut contenir que des chiffres, des espaces et le signe +.",
+      passwordRequired: "Le mot de passe est obligatoire.",
+      passwordTooShort:
+        "Le mot de passe doit contenir au moins 10 caractères.",
+      confirmationRequired: "Confirmez le mot de passe.",
+      confirmationMismatch: "Les mots de passe ne correspondent pas.",
+      sessionExpired:
+        "Votre session a expiré. Reconnectez-vous pour continuer.",
+      updateFailed:
+        "Impossible d'enregistrer vos informations. Veuillez réessayer.",
+      passwordFailed:
+        "Impossible de mettre à jour le mot de passe. Veuillez réessayer.",
     },
   },
   auth: {
@@ -195,6 +340,65 @@ export const fr = {
         "Votre inscription est en cours de traitement. Actualisez la page dans quelques instants.",
       comingSoonDescription:
         "Les fonctionnalités de votre tableau de bord seront activées progressivement.",
+      quickAccessTitle: "Accès rapide",
+      quickAccessDescription: "Retrouvez les raccourcis vers vos espaces.",
+      quickAccess: {
+        profile: {
+          title: "Profil",
+          description:
+            "Gérez vos informations personnelles et votre photo.",
+        },
+        programs: {
+          title: "Programmes",
+          description:
+            "Consultez le catalogue des formations et leurs parcours.",
+        },
+        management: {
+          title: "Gestion",
+          description:
+            "Accédez aux outils de gestion de votre établissement.",
+        },
+      },
+    },
+    academicHub: {
+      metadataTitle: "Académique — UNOVA",
+      eyebrow: "Espace académique",
+      title: "Académique",
+      description: "Accédez aux modules de votre espace académique.",
+      available: "Disponible",
+      comingSoon: "Bientôt disponible",
+      modules: {
+        programs: {
+          title: "Programmes",
+          description:
+            "Consultez le catalogue des formations et leurs parcours.",
+        },
+        courses: {
+          title: "Cours",
+          description:
+            "Les cours et supports pédagogiques seront accessibles ici.",
+        },
+        documents: {
+          title: "Documents",
+          description:
+            "Vos documents administratifs et académiques seront disponibles ici.",
+        },
+        videos: {
+          title: "Vidéos",
+          description:
+            "Les vidéos pédagogiques seront regroupées dans cet espace.",
+        },
+        schedules: {
+          title: "Emplois du temps",
+          description:
+            "Les emplois du temps officiels seront publiés ici.",
+        },
+        questions: {
+          title: "Questions-Réponses",
+          description:
+            "Cet espace permettra d'échanger des questions et des réponses.",
+        },
+      },
     },
     management: {
       metadataTitle: "Gestion — UNOVA",

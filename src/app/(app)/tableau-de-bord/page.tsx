@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Notice } from "@/components/notice";
 import { fr } from "@/content/fr";
+import { hasManagementRole } from "@/lib/auth/roles";
 import {
   getCurrentEnrollment,
   getCurrentProfile,
@@ -63,6 +64,31 @@ export default async function DashboardPage() {
   const enrollmentNotice = enrollment
     ? getEnrollmentNotice(enrollment.status)
     : null;
+  const canManage = hasManagementRole(
+    roles?.map((role) => role.role_code) ?? null,
+  );
+  const quickAccessLabels = fr.app.dashboard.quickAccess;
+  const quickAccess = [
+    {
+      key: "profile",
+      href: "/profil",
+      ...quickAccessLabels.profile,
+    },
+    {
+      key: "programs",
+      href: "/programmes",
+      ...quickAccessLabels.programs,
+    },
+    ...(canManage
+      ? [
+          {
+            key: "management",
+            href: "/gestion",
+            ...quickAccessLabels.management,
+          },
+        ]
+      : []),
+  ];
 
   return (
     <section className="mx-auto w-full max-w-4xl">
@@ -108,6 +134,33 @@ export default async function DashboardPage() {
           </Notice>
         )
       ) : null}
+
+      <div className="mt-8">
+        <h2 className="text-xl font-semibold tracking-tight text-primary">
+          {fr.app.dashboard.quickAccessTitle}
+        </h2>
+        <p className="mt-1 text-sm leading-6 text-slate-600">
+          {fr.app.dashboard.quickAccessDescription}
+        </p>
+
+        <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {quickAccess.map((item) => (
+            <li key={item.key}>
+              <Link
+                href={item.href}
+                className="flex h-full flex-col rounded-2xl border border-primary/10 bg-white p-5 shadow-sm transition-colors hover:border-accent/40 hover:bg-accent/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              >
+                <p className="text-base font-semibold text-primary">
+                  {item.title}
+                </p>
+                <p className="mt-1 text-sm leading-6 text-slate-600">
+                  {item.description}
+                </p>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
 
       <div className="mt-8 rounded-2xl border border-primary/10 bg-white p-6 shadow-sm">
         <span className="inline-flex items-center rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-sm font-medium text-primary">
