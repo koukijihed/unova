@@ -8,6 +8,11 @@ d'environnement et la procédure de retour arrière.
 
 ## Statut actuel
 
+L'application est **déployée en production** sur
+<https://unova.unova-app-essect.workers.dev> (Worker `unova`, version
+`5549992f-2d01-4442-9339-b2eb4563c60f`, 7 novembre 2026). Le domaine
+personnalisé reste à configurer.
+
 La configuration est prête, le build de l'adaptateur réussit et la
 prévisualisation locale dans workerd fonctionne. Pour contourner le défaut
 amont qui bloquait les routes dynamiques, **Cache Components est désactivé**
@@ -63,8 +68,24 @@ plus d'être disponibles à l'exécution pour le code serveur.
 Créer `.env.local` à partir de `.env.example` et renseigner les valeurs
 localement. Ce fichier est ignoré par Git.
 
+Pour la production, créer `.env.production.local` avec l'URL publique :
+
+```sh
+NEXT_PUBLIC_APP_URL=https://unova.unova-app-essect.workers.dev
+```
+
+Ce fichier est également ignoré par Git (`.env*`, sauf `.env.example`).
+`.env.production.local` est chargé en priorité sur `.env.local` lors d'un
+build de production.
+
 Pour un build en CI (y compris Workers Builds), définir les mêmes variables
 dans les « Build variables and secrets » de l'environnement de build.
+
+> **Important** : les variables `NEXT_PUBLIC_*` sont figées dans le bundle au
+> moment du build. Modifier `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_SUPABASE_URL`
+> ou `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` exige donc un nouveau build et un
+> nouveau déploiement ; les modifier dans le tableau de bord Cloudflare n'a
+> aucun effet sur ces valeurs.
 
 ### 3.2 Variables d'exécution en production
 
@@ -164,12 +185,26 @@ une mise en production réelle, le plan Workers Paid est recommandé.
 
 ## 7. Déploiement
 
+URL de production : <https://unova.unova-app-essect.workers.dev>
+
+Commande de (re)déploiement :
+
 ```sh
 npm run deploy -- --keep-vars
 ```
 
 La commande construit l'application, prépare le bundle OpenNext, puis déploie le
-Worker `unova`.
+Worker `unova`. `--keep-vars` conserve les variables et secrets définis dans le
+tableau de bord Cloudflare.
+
+Premier déploiement effectué le 7 novembre 2026 :
+
+- URL : <https://unova.unova-app-essect.workers.dev>
+- Version : `5549992f-2d01-4442-9339-b2eb4563c60f`
+
+Rappel : les valeurs `NEXT_PUBLIC_*` sont intégrées au build. Après toute
+modification de ces variables (ou du domaine), relancer
+`npm run deploy -- --keep-vars`.
 
 Pour publier une version sans basculer immédiatement 100 % du trafic :
 
