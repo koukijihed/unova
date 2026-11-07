@@ -1,0 +1,6 @@
+# Exemple de fichier .dev.vars — aucune valeur réelle.
+# Copier ce fichier vers .dev.vars (ignoré par Git) pour la prévisualisation locale.
+# Les variables applicatives se trouvent dans .env.local (voir .env.example).
+
+# Environnement Next.js chargé par Wrangler en local : development ou production.
+NEXTJS_ENV=development
