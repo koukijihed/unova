@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DocumentManagement } from "@/components/documents/document-management";
 import { DocumentUploadForm } from "@/components/documents/document-upload-form";
+import { DriveLinkForm } from "@/components/drive/drive-link-form";
+import { DriveLinkManagement } from "@/components/drive/drive-link-management";
 import { FeedbackProvider } from "@/components/management/feedback";
 import { Notice } from "@/components/notice";
 import { fr } from "@/content/fr";
@@ -10,6 +12,9 @@ import {
   canUploadToCourse,
   getCourseDocuments,
 } from "@/lib/documents/data";
+import { getCourseDriveLinks } from "@/lib/drive/data";
+import { driveKindLabel } from "@/lib/drive/format";
+import { openUrl } from "@/lib/drive/links";
 import { getVisibleCourse } from "@/lib/management/course-data";
 import {
   categoryLabel,
@@ -60,15 +65,22 @@ export default async function CourseDetailPage({
   const category = isDocumentCategory(categoryParam) ? categoryParam : null;
   const query = readSearchParam(queryParams.q).trim().slice(0, 100);
 
-  const [{ course, error }, canUpload, documentsResult] = await Promise.all([
+  const [
+    { course, error },
+    canUpload,
+    documentsResult,
+    driveLinksResult,
+  ] = await Promise.all([
     getVisibleCourse(id),
     canUploadToCourse(id),
     getCourseDocuments(id),
+    getCourseDriveLinks(id),
   ]);
 
   const labels = fr.app.courses;
   const detail = labels.detail;
   const documentLabels = fr.app.documents;
+  const driveLabels = fr.app.driveLinks;
 
   if (error) {
     return (
@@ -317,6 +329,92 @@ export default async function CourseDetailPage({
             </ul>
           </FeedbackProvider>
         )}
+
+        <div className="mt-8 border-t border-primary/10 pt-6">
+          <h3 className="text-lg font-semibold tracking-tight text-primary">
+            {driveLabels.sectionTitle}
+          </h3>
+          <p className="mt-1 text-sm leading-6 text-slate-600">
+            {driveLabels.sectionDescription}
+          </p>
+
+          {canUpload ? <DriveLinkForm courseId={id} /> : null}
+
+          {driveLinksResult.error ? (
+            <Notice tone="error">{driveLabels.list.loadFailed}</Notice>
+          ) : driveLinksResult.links.length === 0 ? (
+            <p className="mt-5 rounded-xl border border-dashed border-primary/20 bg-background px-4 py-6 text-center text-sm leading-6 text-slate-600">
+              {driveLabels.list.empty}
+            </p>
+          ) : (
+            <FeedbackProvider>
+              <ul className="mt-5 space-y-4">
+                {driveLinksResult.links.map((link) => (
+                  <li
+                    key={link.id}
+                    className="rounded-2xl border border-primary/10 bg-background p-4"
+                  >
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h4 className="text-base font-semibold text-primary">
+                            {link.title}
+                          </h4>
+                          {link.status === "rejected" ? (
+                            <span className="inline-flex items-center rounded-full border border-amber-300 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-900">
+                              {driveLabels.status.rejected}
+                            </span>
+                          ) : null}
+                        </div>
+
+                        <p className="mt-1 flex flex-wrap items-center gap-2 text-xs leading-5 text-slate-600">
+                          <span>{driveKindLabel(link.kind)}</span>
+                          <span aria-hidden="true">·</span>
+                          <span>{categoryLabel(link.category)}</span>
+                          <span aria-hidden="true">·</span>
+                          <span>{formatDate(link.createdAt)}</span>
+                        </p>
+
+                        {link.description ? (
+                          <p className="mt-2 text-sm leading-6 whitespace-pre-line text-slate-600">
+                            {link.description}
+                          </p>
+                        ) : null}
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Link
+                          href={`/liens/${link.id}`}
+                          className="inline-flex min-h-9 items-center justify-center rounded-lg border border-primary/20 bg-white px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                        >
+                          {driveLabels.actions.view}
+                        </Link>
+                        <a
+                          href={openUrl(link.kind, link.driveId)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex min-h-9 items-center justify-center rounded-lg border border-primary/20 bg-white px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                        >
+                          {driveLabels.actions.openDrive}
+                        </a>
+                      </div>
+                    </div>
+
+                    {canUpload ? (
+                      <DriveLinkManagement
+                        linkId={link.id}
+                        title={link.title}
+                        description={link.description}
+                        category={link.category}
+                        status={link.status}
+                      />
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            </FeedbackProvider>
+          )}
+        </div>
       </section>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">

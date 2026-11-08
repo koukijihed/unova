@@ -1,3 +1,8 @@
+import {
+  DRIVE_KIND_LABELS,
+  DRIVE_URL_ERROR,
+} from "@/lib/drive/links";
+
 export const fr = {
   site: {
     name: "UNOVA",
@@ -594,6 +599,105 @@ export const fr = {
         download: "Télécharger",
         loadFailed: "Impossible de charger ce document pour le moment.",
         notFound: "Document introuvable.",
+      },
+    },
+    driveLinks: {
+      metadataTitle: "Liens Google Drive — UNOVA",
+      sectionTitle: "Liens Google Drive",
+      sectionDescription:
+        "Consultez les ressources Google Drive partagées pour ce cours.",
+      kinds: DRIVE_KIND_LABELS,
+      status: {
+        rejected: "Masqué",
+      },
+      actions: {
+        view: "Afficher",
+        openDrive: "Ouvrir dans Google Drive",
+      },
+      list: {
+        empty: "Aucun lien Google Drive n'est ajouté à ce cours.",
+        loadFailed:
+          "Impossible de charger les liens Google Drive pour le moment.",
+      },
+      add: {
+        title: "Ajouter un lien Google Drive",
+        description:
+          "Collez le lien de partage d'un fichier ou d'un dossier Google Drive.",
+        fields: {
+          url: "Lien Google Drive",
+          title: "Titre",
+          description: "Description",
+          category: "Catégorie",
+        },
+        urlPlaceholder: "https://drive.google.com/...",
+        titlePlaceholder: "Ex. : Chapitre 1 — Diapositives",
+        descriptionPlaceholder: "Description facultative",
+        help: "Dans Google Drive, réglez le partage sur « Toute personne disposant du lien » (Lecteur), puis copiez le lien. Sinon, les étudiants devront se connecter à Google et n'auront probablement pas accès.",
+        warning:
+          "Ne partagez pas par ce moyen des documents confidentiels (sujets d'examen, notes). Toute personne qui reçoit le lien peut l'ouvrir sans passer par UNOVA.",
+        submit: "Ajouter le lien",
+        submitting: "Ajout…",
+        success: "Le lien Google Drive a été ajouté.",
+        errors: {
+          invalidUrl: DRIVE_URL_ERROR,
+          titleRequired: "Le titre est obligatoire.",
+          titleTooShort: "Le titre doit contenir au moins 2 caractères.",
+          titleTooLong: "Le titre ne doit pas dépasser 200 caractères.",
+          descriptionTooLong:
+            "La description ne doit pas dépasser 2000 caractères.",
+          invalidCategory: "La catégorie est invalide.",
+          duplicate: "Ce lien est déjà ajouté à ce cours.",
+          forbidden: "Accès refusé.",
+          generic: "Une erreur est survenue. Réessayez.",
+          sessionExpired:
+            "Votre session a expiré. Reconnectez-vous pour continuer.",
+        },
+      },
+      management: {
+        edit: "Modifier",
+        editTitle: "Modifier le lien",
+        save: "Enregistrer",
+        saving: "Enregistrement…",
+        cancel: "Annuler",
+        updated: "Le lien a été mis à jour.",
+        hide: "Masquer",
+        hideTitle: "Masquer le lien",
+        hideDescription:
+          "Le lien « {title} » ne sera plus visible par les étudiants.",
+        hideConfirm: "Masquer",
+        show: "Afficher",
+        showTitle: "Afficher le lien",
+        showDescription:
+          "Le lien « {title} » sera de nouveau visible par les étudiants.",
+        showConfirm: "Afficher",
+        statusUpdated: "La visibilité du lien a été mise à jour.",
+        delete: "Supprimer",
+        deleteTitle: "Supprimer le lien",
+        deleteDescription:
+          "Le lien « {title} » sera définitivement supprimé.",
+        deleteConfirm: "Supprimer",
+        deleting: "Suppression…",
+        deleted: "Le lien a été supprimé.",
+        processing: "Traitement…",
+        errors: {
+          forbidden: "Accès refusé.",
+          generic: "Une erreur est survenue. Réessayez.",
+          sessionExpired:
+            "Votre session a expiré. Reconnectez-vous pour continuer.",
+        },
+      },
+      detail: {
+        back: "Retour au cours",
+        courseLabel: "Cours",
+        kindLabel: "Type",
+        categoryLabel: "Catégorie",
+        previewTitle: "Aperçu",
+        previewUnavailable:
+          "Si le document ne s'affiche pas, il n'est probablement pas partagé avec « Toute personne disposant du lien ». Contactez l'enseignant.",
+        openDrive: "Ouvrir dans Google Drive",
+        loadFailed: "Impossible de charger ce lien pour le moment.",
+        notFound: "Lien introuvable.",
+        iframeTitle: "Aperçu Google Drive : {title}",
       },
     },
     management: {

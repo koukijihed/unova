@@ -33,6 +33,7 @@ Dernière mise à jour : 8 novembre 2026
 - Gestion des cours `/gestion/cours` (administrateurs et directeurs) : sélecteur de classe `?classe=<id>`, création (nom 2 à 200 caractères, semestre facultatif de 1 à 10, description 2000 caractères maximum), modification, activation/désactivation sans suppression, et gestion des enseignants du cours par adresse e-mail via `find_teacher_by_email` avec confirmation de retrait.
 - Pages de cours `/cours` et `/cours/[id]` pour tous les utilisateurs connectés : visibilité appliquée par les politiques RLS, recherche `?q=` insensible aux accents, cartes avec nom, libellé de classe `<code> — <classe> (<année>)`, semestre et noms des enseignants (`course_teacher_names`), états vides adaptés (compte non vérifié, inscription en attente ou non active), et sections « Vidéos » et « Questions-Réponses » marquées « Bientôt disponible ».
 - Documents de cours : téléversement direct vers le bucket privé `documents` via URL signée (aucun fichier ne traverse le serveur Next.js/Cloudflare), validation du type MIME, de l'extension, de la taille (50 Mo) et des octets magiques, vérification de l'objet stocké avant validation définitive ; liste par cours avec filtre `?categorie=` et recherche `?q=` insensible aux accents, page `/documents` avec filtres `?cours=`, `?categorie=`, `?q=` et pagination de 20 par page, visionneuse `/documents/[id]` (PDF intégré, images, message pour les autres formats), route `/documents/[id]/fichier?mode=view|download` avec URL signée de 60 secondes, et contrôles de gestion (modification, masquage/affichage, suppression avec confirmation) réservés aux utilisateurs autorisés par `can_upload_to_course`.
+- Liens Google Drive par cours : ajout, modification, masquage/affichage et suppression avec confirmation par les utilisateurs autorisés par `can_upload_to_course`, affichage dans la section Documents du cours et visionneuse intégrée `/liens/[id]`. Seuls le type de ressource et l'identifiant Drive sont stockés ; toutes les URL sont reconstruites côté site sur `drive.google.com` et `docs.google.com`. Auto-test des liens dans `scripts/test-drive-links.mjs` (`npm run test:drive-links`).
 - Tableau de bord avec le message « Bonjour, <prénom> » et notices d'inscription : aucun profil étudiant (lien vers `/verification`), en attente, acceptée, refusée, interrompue ou terminée.
 - Écran d'acceptation des inscriptions pour les administrateurs et directeurs de programme : `/gestion` et `/gestion/etudiants`, sélection de classe, recherche par nom, compteurs, actions Accepter / Refuser / Remettre en attente (y compris pour les inscriptions acceptées), refus d'une inscription acceptée avec confirmation, et « Tout accepter » avec confirmation.
 - Accès à `/gestion` réservé aux rôles `admin` et `director`, avec entrée « Gestion » affichée uniquement pour ces rôles.
@@ -62,7 +63,7 @@ Dernière mise à jour : 8 novembre 2026
 - Import et consultation des plans d'études officiels.
 - Page d'import de la liste officielle dans l'administration.
 - Aperçu des fichiers Word, PowerPoint et Excel dans le navigateur.
-- Vidéos pédagogiques.
+- Vidéos YouTube.
 - Questions-Réponses.
 - Emplois du temps.
 - Nettoyage des fichiers orphelins dans le bucket `documents`.
@@ -91,3 +92,5 @@ Dernière mise à jour : 8 novembre 2026
 
 - Des fichiers orphelins peuvent rester dans le bucket `documents` si un téléversement est interrompu avant la validation définitive.
 - Le stockage du plan gratuit Supabase est d'environ 1 Go ; les documents partagent cette limite avec les autres fichiers de l'application.
+- Les liens Google Drive dépendent des réglages de partage Google et ne peuvent pas être vérifiés par le site.
+- Un fichier Google Drive supprimé rend le lien correspondant mort.
