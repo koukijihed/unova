@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { fr } from "@/content/fr";
-import { hasAdminRole } from "@/lib/auth/roles";
+import { hasAdminRole, hasManagementRole } from "@/lib/auth/roles";
 import { getCurrentRoles } from "@/lib/auth/session";
 
 const cards = fr.app.management.cards;
@@ -15,6 +15,7 @@ type ManagementCard = {
 export default async function ManagementPage() {
   const roles = await getCurrentRoles();
   const isAdmin = hasAdminRole(roles);
+  const canManage = hasManagementRole(roles);
 
   const managementCards: ManagementCard[] = [
     {
@@ -23,6 +24,26 @@ export default async function ManagementPage() {
       href: "/gestion/etudiants",
       action: cards.students.action,
     },
+    ...(isAdmin
+      ? [
+          {
+            title: cards.teachers.title,
+            description: cards.teachers.description,
+            href: "/gestion/enseignants",
+            action: cards.teachers.action,
+          },
+        ]
+      : []),
+    ...(canManage
+      ? [
+          {
+            title: cards.courses.title,
+            description: cards.courses.description,
+            href: "/gestion/cours",
+            action: cards.courses.action,
+          },
+        ]
+      : []),
     ...(isAdmin
       ? [
           {
@@ -39,10 +60,6 @@ export default async function ManagementPage() {
           },
         ]
       : []),
-    {
-      title: cards.teachers.title,
-      description: cards.teachers.description,
-    },
     {
       title: cards.schedules.title,
       description: cards.schedules.description,

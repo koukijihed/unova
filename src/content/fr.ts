@@ -353,6 +353,11 @@ export const fr = {
           description:
             "Consultez le catalogue des formations et leurs parcours.",
         },
+        courses: {
+          title: "Cours",
+          description:
+            "Consultez les cours auxquels votre compte donne accès.",
+        },
         management: {
           title: "Gestion",
           description:
@@ -400,6 +405,47 @@ export const fr = {
         },
       },
     },
+    courses: {
+      metadataTitle: "Cours — UNOVA",
+      eyebrow: "Espace académique",
+      title: "Cours",
+      description: "Consultez les cours auxquels votre compte donne accès.",
+      searchLabel: "Rechercher un cours",
+      searchPlaceholder: "Nom du cours, classe ou enseignant",
+      searchSubmit: "Rechercher",
+      clearSearch: "Effacer la recherche",
+      resultsCountOne: "1 cours trouvé",
+      resultsCountMany: "{count} cours trouvés",
+      noResults: "Aucun cours ne correspond à votre recherche.",
+      empty: "Aucun cours disponible.",
+      loadFailed: "Impossible de charger les cours pour le moment.",
+      semesterLabel: "Semestre",
+      semesterValue: "Semestre {semester}",
+      teachersLabel: "Enseignants",
+      noTeachers: "Aucun enseignant affecté.",
+      classUnavailable: "Classe non communiquée",
+      notVerified:
+        "Votre compte n'est pas encore vérifié. Vérifiez votre identité avec votre CIN pour accéder à vos cours.",
+      verifyLink: "Vérifier mon identité",
+      enrollmentPending:
+        "Votre inscription est en attente de validation. Vos cours seront accessibles dès qu'elle sera acceptée.",
+      enrollmentNotAccepted:
+        "Votre inscription n'est pas active. Contactez l'administration pour plus d'informations.",
+      detail: {
+        back: "Retour aux cours",
+        descriptionLabel: "Description",
+        noDescription: "Aucune description n'est renseignée.",
+        teachersTitle: "Enseignants",
+        documentsTitle: "Documents",
+        documentsDescription: "Les documents du cours seront publiés ici.",
+        videosTitle: "Vidéos",
+        videosDescription: "Les vidéos du cours seront publiées ici.",
+        questionsTitle: "Questions-Réponses",
+        questionsDescription:
+          "Les questions et réponses du cours seront publiées ici.",
+        loadFailed: "Impossible de charger ce cours pour le moment.",
+      },
+    },
     management: {
       metadataTitle: "Gestion — UNOVA",
       eyebrow: "Espace de gestion",
@@ -419,7 +465,14 @@ export const fr = {
         teachers: {
           title: "Enseignants",
           description:
-            "La gestion des enseignants sera disponible prochainement.",
+            "Attribuez ou retirez le rôle d'enseignant aux comptes de l'établissement.",
+          action: "Ouvrir",
+        },
+        courses: {
+          title: "Cours",
+          description:
+            "Gérez les cours des classes et leurs enseignants.",
+          action: "Ouvrir",
         },
         programs: {
           title: "Programmes et classes",
@@ -442,6 +495,152 @@ export const fr = {
           title: "Statistiques",
           description:
             "Les statistiques de gestion seront disponibles prochainement.",
+        },
+      },
+      teachers: {
+        metadataTitle: "Enseignants — Gestion — UNOVA",
+        eyebrow: "Gestion des enseignants",
+        title: "Enseignants",
+        description:
+          "Attribuez ou retirez le rôle d'enseignant. Seuls les noms sont affichés.",
+        addTitle: "Ajouter un enseignant",
+        addDescription:
+          "Recherchez un compte par son adresse e-mail, puis attribuez-lui le rôle d'enseignant.",
+        emailLabel: "Adresse e-mail",
+        emailPlaceholder: "prenom.nom@exemple.tn",
+        addSubmit: "Ajouter",
+        adding: "Ajout…",
+        listTitle: "Enseignants enregistrés",
+        empty: "Aucun enseignant n'est enregistré.",
+        loadFailed:
+          "Impossible de charger les enseignants pour le moment.",
+        table: {
+          caption: "Liste des enseignants",
+          name: "Enseignant",
+          actions: "Actions",
+        },
+        remove: "Retirer le rôle",
+        removeTitle: "Retirer le rôle d'enseignant",
+        removeDescription:
+          "{name} perdra le rôle d'enseignant. Cette action n'est possible que si la personne n'est affectée à aucun cours.",
+        removeConfirm: "Retirer le rôle",
+        removing: "Retrait…",
+        messages: {
+          added: "Le rôle d'enseignant a été attribué.",
+          removed: "Le rôle d'enseignant a été retiré.",
+          notFound: "Aucun compte ne correspond à cette adresse.",
+          alreadyTeacher: "Cette personne est déjà enseignante.",
+          assignedToCourses:
+            "Cet enseignant est encore affecté à des cours. Retirez-le d'abord de ces cours.",
+          forbidden: "Accès refusé.",
+          generic: "Une erreur est survenue. Réessayez.",
+          sessionExpired:
+            "Votre session a expiré. Reconnectez-vous pour continuer.",
+        },
+        errors: {
+          emailRequired: "L'adresse e-mail est obligatoire.",
+          emailInvalid: "Saisissez une adresse e-mail valide.",
+        },
+      },
+      courses: {
+        metadataTitle: "Cours — Gestion — UNOVA",
+        eyebrow: "Gestion des cours",
+        title: "Cours",
+        description:
+          "Gérez les cours des classes dont vous avez la charge.",
+        classLabel: "Classe",
+        classPlaceholder: "Sélectionner une classe",
+        showClass: "Afficher",
+        noClasses: "Aucune classe n'est disponible pour votre compte.",
+        noClassSelected:
+          "Sélectionnez une classe pour afficher ses cours.",
+        invalidClass:
+          "Cette classe n'est pas accessible depuis votre compte.",
+        classesLoadFailed:
+          "Impossible de charger les classes pour le moment.",
+        coursesLoadFailed:
+          "Impossible de charger les cours pour le moment.",
+        listTitle: "Cours de la classe",
+        noCourses: "Aucun cours n'est enregistré dans cette classe.",
+        createTitle: "Nouveau cours",
+        createDescription:
+          "Le cours sera rattaché à la classe sélectionnée.",
+        editTitle: "Modifier le cours",
+        fields: {
+          name: "Nom du cours",
+          namePlaceholder: "Ex. : Comptabilité générale",
+          semester: "Semestre",
+          semesterPlaceholder: "Aucun semestre",
+          description: "Description",
+          descriptionPlaceholder: "Description facultative du cours",
+        },
+        errors: {
+          nameRequired: "Le nom du cours est obligatoire.",
+          nameTooShort:
+            "Le nom du cours doit contenir au moins 2 caractères.",
+          nameTooLong:
+            "Le nom du cours ne doit pas dépasser 200 caractères.",
+          semesterInvalid: "Le semestre doit être compris entre 1 et 10.",
+          descriptionTooLong:
+            "La description ne doit pas dépasser 2000 caractères.",
+        },
+        badges: {
+          active: "Actif",
+          inactive: "Inactif",
+        },
+        actions: {
+          edit: "Modifier",
+          cancelEdit: "Annuler",
+          activate: "Activer",
+          deactivate: "Désactiver",
+          activateTitle: "Activer le cours",
+          activateDescription:
+            "Le cours « {name} » sera de nouveau visible par les étudiants.",
+          activateConfirm: "Activer",
+          deactivateTitle: "Désactiver le cours",
+          deactivateDescription:
+            "Le cours « {name} » ne sera plus visible par les étudiants.",
+          deactivateConfirm: "Désactiver",
+          processing: "Traitement…",
+        },
+        teachers: {
+          title: "Enseignants du cours",
+          empty: "Aucun enseignant n'est affecté à ce cours.",
+          addLabel: "Ajouter un enseignant par adresse e-mail",
+          addPlaceholder: "prenom.nom@exemple.tn",
+          addSubmit: "Ajouter",
+          adding: "Ajout…",
+          remove: "Retirer",
+          removeTitle: "Retirer l'enseignant",
+          removeDescription:
+            "{name} sera retiré du cours « {course} ».",
+          removeConfirm: "Retirer",
+          removing: "Retrait…",
+          messages: {
+            added: "L'enseignant a été affecté au cours.",
+            removed: "L'enseignant a été retiré du cours.",
+            notFound: "Aucun enseignant ne correspond à cette adresse.",
+            alreadyAssigned:
+              "Cet enseignant est déjà affecté à ce cours.",
+            forbidden: "Accès refusé.",
+            generic: "Une erreur est survenue. Réessayez.",
+          },
+          errors: {
+            emailRequired: "L'adresse e-mail est obligatoire.",
+            emailInvalid: "Saisissez une adresse e-mail valide.",
+          },
+        },
+        messages: {
+          created: "Le cours a été créé.",
+          updated: "Le cours a été mis à jour.",
+          activated: "Le cours a été activé.",
+          deactivated: "Le cours a été désactivé.",
+          unique:
+            "Un cours portant ce nom existe déjà dans cette classe.",
+          forbidden: "Accès refusé.",
+          generic: "Une erreur est survenue. Réessayez.",
+          sessionExpired:
+            "Votre session a expiré. Reconnectez-vous pour continuer.",
         },
       },
       students: {

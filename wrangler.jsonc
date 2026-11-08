@@ -3,6 +3,8 @@
 	"main": ".open-next/worker.js",
 	"name": "unova",
 	"compatibility_date": "2026-11-07",
+	"workers_dev": true,
+	"preview_urls": false,
 	"compatibility_flags": [
 		"nodejs_compat",
 		"global_fetch_strictly_public"

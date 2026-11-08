@@ -79,6 +79,11 @@ export default async function DashboardPage() {
       href: "/programmes",
       ...quickAccessLabels.programs,
     },
+    {
+      key: "courses",
+      href: "/cours",
+      ...quickAccessLabels.courses,
+    },
     ...(canManage
       ? [
           {
