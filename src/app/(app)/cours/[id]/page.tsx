@@ -1,17 +1,45 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { DocumentManagement } from "@/components/documents/document-management";
+import { DocumentUploadForm } from "@/components/documents/document-upload-form";
+import { FeedbackProvider } from "@/components/management/feedback";
 import { Notice } from "@/components/notice";
 import { fr } from "@/content/fr";
+import {
+  canUploadToCourse,
+  getCourseDocuments,
+} from "@/lib/documents/data";
 import { getVisibleCourse } from "@/lib/management/course-data";
+import {
+  categoryLabel,
+  fileTypeLabel,
+  formatBytes,
+  formatDate,
+} from "@/lib/documents/format";
+import {
+  DOCUMENT_CATEGORIES,
+  isDocumentCategory,
+} from "@/lib/documents/types";
+import { normalizeForSearch } from "@/lib/documents/validation";
 
 type CourseDetailPageProps = {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{
+    categorie?: string | string[];
+    q?: string | string[];
+  }>;
 };
+
+function readSearchParam(value: string | string[] | undefined): string {
+  return typeof value === "string" ? value : "";
+}
 
 export async function generateMetadata({
   params,
-}: CourseDetailPageProps): Promise<Metadata> {
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
   const { id } = await params;
   const { course } = await getVisibleCourse(id);
 
@@ -24,11 +52,23 @@ export async function generateMetadata({
 
 export default async function CourseDetailPage({
   params,
+  searchParams,
 }: CourseDetailPageProps) {
   const { id } = await params;
-  const { course, error } = await getVisibleCourse(id);
+  const queryParams = await searchParams;
+  const categoryParam = readSearchParam(queryParams.categorie).trim();
+  const category = isDocumentCategory(categoryParam) ? categoryParam : null;
+  const query = readSearchParam(queryParams.q).trim().slice(0, 100);
+
+  const [{ course, error }, canUpload, documentsResult] = await Promise.all([
+    getVisibleCourse(id),
+    canUploadToCourse(id),
+    getCourseDocuments(id),
+  ]);
+
   const labels = fr.app.courses;
   const detail = labels.detail;
+  const documentLabels = fr.app.documents;
 
   if (error) {
     return (
@@ -42,11 +82,20 @@ export default async function CourseDetailPage({
     notFound();
   }
 
-  const sections = [
-    {
-      title: detail.documentsTitle,
-      description: detail.documentsDescription,
-    },
+  const normalizedQuery = normalizeForSearch(query);
+  const documents = documentsResult.documents.filter((document) => {
+    if (category && document.category !== category) {
+      return false;
+    }
+
+    if (!normalizedQuery) {
+      return true;
+    }
+
+    return normalizeForSearch(document.title).includes(normalizedQuery);
+  });
+  const hasFilters = Boolean(category || query);
+  const comingSoonSections = [
     {
       title: detail.videosTitle,
       description: detail.videosDescription,
@@ -121,8 +170,157 @@ export default async function CourseDetailPage({
         )}
       </section>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
-        {sections.map((section) => (
+      <section className="mt-6 rounded-2xl border border-primary/10 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-semibold tracking-tight text-primary">
+          {detail.documentsTitle}
+        </h2>
+
+        <form
+          method="get"
+          action={`/cours/${id}`}
+          className="mt-4 grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-end"
+        >
+          <div>
+            <label
+              htmlFor="document-category-filter"
+              className="mb-1.5 block text-sm font-medium text-slate-800"
+            >
+              {documentLabels.filters.categoryLabel}
+            </label>
+            <select
+              id="document-category-filter"
+              name="categorie"
+              defaultValue={category ?? ""}
+              className="h-10 w-full rounded-xl border border-primary/15 bg-white px-3 text-sm text-foreground shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              <option value="">{documentLabels.filters.categoryAll}</option>
+              {DOCUMENT_CATEGORIES.map((value) => (
+                <option key={value} value={value}>
+                  {documentLabels.categories[value]}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label
+              htmlFor="document-search"
+              className="mb-1.5 block text-sm font-medium text-slate-800"
+            >
+              {documentLabels.filters.searchLabel}
+            </label>
+            <input
+              id="document-search"
+              type="search"
+              name="q"
+              defaultValue={query}
+              maxLength={100}
+              placeholder={documentLabels.filters.searchPlaceholder}
+              className="h-10 w-full rounded-xl border border-primary/15 bg-white px-3 text-sm text-foreground shadow-sm placeholder:text-slate-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            />
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="submit"
+              className="inline-flex h-10 items-center justify-center rounded-xl bg-primary px-4 text-sm font-semibold text-white transition-colors hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              {documentLabels.filters.submit}
+            </button>
+
+            {hasFilters ? (
+              <Link
+                href={`/cours/${id}`}
+                className="inline-flex h-10 items-center justify-center rounded-xl border border-primary/20 bg-white px-4 text-sm font-semibold text-primary transition-colors hover:bg-primary/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              >
+                {documentLabels.filters.clear}
+              </Link>
+            ) : null}
+          </div>
+        </form>
+
+        {canUpload ? <DocumentUploadForm courseId={id} /> : null}
+
+        {documentsResult.error ? (
+          <Notice tone="error">{documentLabels.list.loadFailed}</Notice>
+        ) : documents.length === 0 ? (
+          <p className="mt-5 rounded-xl border border-dashed border-primary/20 bg-background px-4 py-6 text-center text-sm leading-6 text-slate-600">
+            {hasFilters
+              ? documentLabels.list.noResults
+              : documentLabels.list.empty}
+          </p>
+        ) : (
+          <FeedbackProvider>
+            <ul className="mt-5 space-y-4">
+              {documents.map((document) => (
+                <li
+                  key={document.id}
+                  className="rounded-2xl border border-primary/10 bg-background p-4"
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-base font-semibold text-primary">
+                          {document.title}
+                        </h3>
+                        {document.status === "rejected" ? (
+                          <span className="inline-flex items-center rounded-full border border-amber-300 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-900">
+                            {documentLabels.status.rejected}
+                          </span>
+                        ) : null}
+                      </div>
+
+                      <p className="mt-1 flex flex-wrap items-center gap-2 text-xs leading-5 text-slate-600">
+                        <span>{categoryLabel(document.category)}</span>
+                        <span aria-hidden="true">·</span>
+                        <span>{fileTypeLabel(document.mimeType)}</span>
+                        <span aria-hidden="true">·</span>
+                        <span>{formatBytes(document.sizeBytes)}</span>
+                        <span aria-hidden="true">·</span>
+                        <span>{formatDate(document.createdAt)}</span>
+                      </p>
+
+                      {document.description ? (
+                        <p className="mt-2 text-sm leading-6 whitespace-pre-line text-slate-600">
+                          {document.description}
+                        </p>
+                      ) : null}
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Link
+                        href={`/documents/${document.id}`}
+                        className="inline-flex min-h-9 items-center justify-center rounded-lg border border-primary/20 bg-white px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                      >
+                        {documentLabels.actions.view}
+                      </Link>
+                      <Link
+                        href={`/documents/${document.id}/fichier?mode=download`}
+                        className="inline-flex min-h-9 items-center justify-center rounded-lg border border-primary/20 bg-white px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                      >
+                        {documentLabels.actions.download}
+                      </Link>
+                    </div>
+                  </div>
+
+                  {canUpload ? (
+                    <DocumentManagement
+                      documentId={document.id}
+                      title={document.title}
+                      description={document.description}
+                      category={document.category}
+                      status={document.status}
+                    />
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </FeedbackProvider>
+        )}
+      </section>
+
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        {comingSoonSections.map((section) => (
           <section
             key={section.title}
             className="rounded-2xl border border-primary/10 bg-white p-5 shadow-sm"

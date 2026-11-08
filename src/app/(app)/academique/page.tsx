@@ -18,7 +18,7 @@ export default function AcademicPage() {
   const modules: AcademicModule[] = [
     { key: "programs", ...labels.modules.programs, href: "/programmes" },
     { key: "courses", ...labels.modules.courses },
-    { key: "documents", ...labels.modules.documents },
+    { key: "documents", ...labels.modules.documents, href: "/documents" },
     { key: "videos", ...labels.modules.videos },
     { key: "schedules", ...labels.modules.schedules },
     { key: "questions", ...labels.modules.questions },

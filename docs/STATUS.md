@@ -28,10 +28,11 @@ Dernière mise à jour : 8 novembre 2026
 - Catalogue des formations partagé entre les routes publiques `/formations`, `/formations/[code]` et les routes authentifiées `/programmes`, `/programmes/[code]` : regroupement par diplôme selon `sort_order`, groupes vides masqués, recherche `?q=` insensible aux accents, cartes (nom, département, badge « Co-construit », parcours).
 - Détail d'une formation : diplôme, département, parcours et note « Le plan d'études détaillé sera publié prochainement. ». Les administrateurs voient aussi les programmes inactifs (badge « Inactif ») et leur `source_note`.
 - Hub `/academique` listant les modules (Programmes, Cours, Documents, Vidéos, Emplois du temps, Questions-Réponses) avec les badges « Disponible » et « Bientôt disponible ».
-- Bloc « Accès rapide » sur le tableau de bord vers Profil, Programmes, Cours et, pour les rôles `admin` et `director`, Gestion.
+- Bloc « Accès rapide » sur le tableau de bord vers Profil, Programmes, Cours, Documents et, pour les rôles `admin` et `director`, Gestion.
 - Gestion des enseignants `/gestion/enseignants` (administrateur uniquement) : liste des comptes ayant le rôle `teacher` (nom et prénom seulement), ajout par adresse e-mail via `admin_find_user` avec insertion dans `user_roles` (`granted_by` = utilisateur courant), messages « Aucun compte ne correspond à cette adresse. » et « Cette personne est déjà enseignante. », retrait du rôle avec confirmation native `<dialog>` et refus si l'enseignant est encore affecté à un cours.
 - Gestion des cours `/gestion/cours` (administrateurs et directeurs) : sélecteur de classe `?classe=<id>`, création (nom 2 à 200 caractères, semestre facultatif de 1 à 10, description 2000 caractères maximum), modification, activation/désactivation sans suppression, et gestion des enseignants du cours par adresse e-mail via `find_teacher_by_email` avec confirmation de retrait.
-- Pages de cours `/cours` et `/cours/[id]` pour tous les utilisateurs connectés : visibilité appliquée par les politiques RLS, recherche `?q=` insensible aux accents, cartes avec nom, libellé de classe `<code> — <classe> (<année>)`, semestre et noms des enseignants (`course_teacher_names`), états vides adaptés (compte non vérifié, inscription en attente ou non active), et sections « Documents », « Vidéos » et « Questions-Réponses » marquées « Bientôt disponible ».
+- Pages de cours `/cours` et `/cours/[id]` pour tous les utilisateurs connectés : visibilité appliquée par les politiques RLS, recherche `?q=` insensible aux accents, cartes avec nom, libellé de classe `<code> — <classe> (<année>)`, semestre et noms des enseignants (`course_teacher_names`), états vides adaptés (compte non vérifié, inscription en attente ou non active), et sections « Vidéos » et « Questions-Réponses » marquées « Bientôt disponible ».
+- Documents de cours : téléversement direct vers le bucket privé `documents` via URL signée (aucun fichier ne traverse le serveur Next.js/Cloudflare), validation du type MIME, de l'extension, de la taille (50 Mo) et des octets magiques, vérification de l'objet stocké avant validation définitive ; liste par cours avec filtre `?categorie=` et recherche `?q=` insensible aux accents, page `/documents` avec filtres `?cours=`, `?categorie=`, `?q=` et pagination de 20 par page, visionneuse `/documents/[id]` (PDF intégré, images, message pour les autres formats), route `/documents/[id]/fichier?mode=view|download` avec URL signée de 60 secondes, et contrôles de gestion (modification, masquage/affichage, suppression avec confirmation) réservés aux utilisateurs autorisés par `can_upload_to_course`.
 - Tableau de bord avec le message « Bonjour, <prénom> » et notices d'inscription : aucun profil étudiant (lien vers `/verification`), en attente, acceptée, refusée, interrompue ou terminée.
 - Écran d'acceptation des inscriptions pour les administrateurs et directeurs de programme : `/gestion` et `/gestion/etudiants`, sélection de classe, recherche par nom, compteurs, actions Accepter / Refuser / Remettre en attente (y compris pour les inscriptions acceptées), refus d'une inscription acceptée avec confirmation, et « Tout accepter » avec confirmation.
 - Accès à `/gestion` réservé aux rôles `admin` et `director`, avec entrée « Gestion » affichée uniquement pour ces rôles.
@@ -60,10 +61,12 @@ Dernière mise à jour : 8 novembre 2026
 
 - Import et consultation des plans d'études officiels.
 - Page d'import de la liste officielle dans l'administration.
-- Documents administratifs et académiques.
+- Aperçu des fichiers Word, PowerPoint et Excel dans le navigateur.
 - Vidéos pédagogiques.
 - Questions-Réponses.
 - Emplois du temps.
+- Nettoyage des fichiers orphelins dans le bucket `documents`.
+- Suivi de l'espace de stockage utilisé.
 - Statistiques de gestion.
 - Affichage et gestion des rôles dans l'interface.
 - Recherche globale fonctionnelle dans l'en-tête de l'espace applicatif.
@@ -74,12 +77,17 @@ Dernière mise à jour : 8 novembre 2026
 
 ## Limites actuelles
 
-- L'acceptation des inscriptions, la gestion des enseignants, des cours et de la structure académique sont disponibles ; les documents, vidéos, questions-réponses et emplois du temps restent à venir.
+- L'acceptation des inscriptions, la gestion des enseignants, des cours et de la structure académique sont disponibles ; les vidéos, questions-réponses et emplois du temps restent à venir.
 - L'import de la liste officielle se fait uniquement en ligne de commande ; aucune page d'administration n'est encore proposée.
-- L'espace applicatif est protégé, mais la plupart de ses pages métier restent des pages d'attente.
+- L'espace applicatif est protégé, mais plusieurs de ses pages métier restent des pages d'attente.
 - Aucune donnée académique, aucun utilisateur fictif et aucune statistique ne sont affichés.
 - La recherche globale de l'en-tête est volontairement désactivée ; la recherche par nom est disponible dans la gestion des étudiants.
 - Le site est déployé en production sur <https://unova.unova-app-essect.workers.dev>, mais aucun domaine personnalisé n'est encore configuré.
 - Cache Components reste désactivé : avec Next.js 16.4.5 et `@opennextjs/cloudflare` 1.20.16, l'activer fait bloquer les routes dynamiques dans workerd (erreur « Worker's code had hung »). Le correctif amont (PR #1318) n'est pas encore publié. Voir `docs/DEPLOIEMENT.md`, section 10.
 - Les URL de redirection Supabase (confirmation d'e-mail et réinitialisation du mot de passe) doivent inclure l'URL de production ; cette configuration se fait dans le tableau de bord Supabase, pas dans le dépôt.
 - Le cache incrémental R2 n'est pas activé ; le guide décrit son activation optionnelle.
+
+## Limites connues
+
+- Des fichiers orphelins peuvent rester dans le bucket `documents` si un téléversement est interrompu avant la validation définitive.
+- Le stockage du plan gratuit Supabase est d'environ 1 Go ; les documents partagent cette limite avec les autres fichiers de l'application.

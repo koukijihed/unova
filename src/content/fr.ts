@@ -358,6 +358,11 @@ export const fr = {
           description:
             "Consultez les cours auxquels votre compte donne accès.",
         },
+        documents: {
+          title: "Documents",
+          description:
+            "Consultez et téléchargez les documents de vos cours.",
+        },
         management: {
           title: "Gestion",
           description:
@@ -386,7 +391,7 @@ export const fr = {
         documents: {
           title: "Documents",
           description:
-            "Vos documents administratifs et académiques seront disponibles ici.",
+            "Consultez et téléchargez les documents pédagogiques de vos cours.",
         },
         videos: {
           title: "Vidéos",
@@ -444,6 +449,151 @@ export const fr = {
         questionsDescription:
           "Les questions et réponses du cours seront publiées ici.",
         loadFailed: "Impossible de charger ce cours pour le moment.",
+      },
+    },
+    documents: {
+      metadataTitle: "Documents — UNOVA",
+      eyebrow: "Espace académique",
+      title: "Documents",
+      description:
+        "Consultez et téléchargez les documents pédagogiques de vos cours.",
+      filters: {
+        courseLabel: "Cours",
+        courseAll: "Tous les cours",
+        categoryLabel: "Catégorie",
+        categoryAll: "Toutes les catégories",
+        searchLabel: "Rechercher un document",
+        searchPlaceholder: "Titre du document",
+        submit: "Filtrer",
+        clear: "Effacer les filtres",
+      },
+      categories: {
+        cours: "Cours",
+        td: "TD",
+        tp: "TP",
+        examen: "Examen",
+        resume: "Résumé",
+        autre: "Autre",
+      },
+      fileTypes: {
+        pdf: "PDF",
+        doc: "Word (DOC)",
+        docx: "Word (DOCX)",
+        ppt: "PowerPoint (PPT)",
+        pptx: "PowerPoint (PPTX)",
+        xls: "Excel (XLS)",
+        xlsx: "Excel (XLSX)",
+        png: "Image PNG",
+        jpeg: "Image JPEG",
+        webp: "Image WebP",
+        other: "Fichier",
+      },
+      status: {
+        rejected: "Masqué",
+      },
+      actions: {
+        view: "Afficher",
+        download: "Télécharger",
+      },
+      list: {
+        resultsCountOne: "1 document trouvé",
+        resultsCountMany: "{count} documents trouvés",
+        empty: "Aucun document disponible.",
+        noResults: "Aucun document ne correspond à votre recherche.",
+        loadFailed: "Impossible de charger les documents pour le moment.",
+      },
+      pagination: {
+        previous: "Page précédente",
+        next: "Page suivante",
+        pageInfo: "Page {page} sur {total}",
+      },
+      upload: {
+        title: "Ajouter un document",
+        description:
+          "Le fichier est envoyé directement à l'espace de stockage sécurisé.",
+        fields: {
+          title: "Titre",
+          titlePlaceholder: "Ex. : Chapitre 1 — Introduction",
+          description: "Description",
+          descriptionPlaceholder: "Description facultative",
+          category: "Catégorie",
+          file: "Fichier",
+        },
+        fileHint:
+          "Formats acceptés : PDF, Word, PowerPoint, Excel, PNG, JPEG et WebP. Taille maximale : 50 Mo.",
+        submit: "Téléverser",
+        preparing: "Préparation…",
+        uploading: "Téléversement…",
+        finalizing: "Vérification…",
+        success: "Le document a été ajouté.",
+        errors: {
+          missingFile: "Sélectionnez un fichier.",
+          titleRequired: "Le titre est obligatoire.",
+          titleTooShort: "Le titre doit contenir au moins 2 caractères.",
+          titleTooLong: "Le titre ne doit pas dépasser 200 caractères.",
+          descriptionTooLong:
+            "La description ne doit pas dépasser 2000 caractères.",
+          tooLarge: "Le fichier dépasse 50 Mo.",
+          typeRefused: "Le type de fichier n'est pas autorisé.",
+          magicMismatch:
+            "Le contenu du fichier ne correspond pas à son format.",
+          uploadFailed: "Le téléversement a échoué. Réessayez.",
+          finalizeFailed:
+            "Le fichier n'a pas pu être vérifié. Réessayez.",
+          forbidden: "Accès refusé.",
+          generic: "Une erreur est survenue. Réessayez.",
+          sessionExpired:
+            "Votre session a expiré. Reconnectez-vous pour continuer.",
+        },
+      },
+      management: {
+        edit: "Modifier",
+        editTitle: "Modifier le document",
+        save: "Enregistrer",
+        saving: "Enregistrement…",
+        cancel: "Annuler",
+        updated: "Le document a été mis à jour.",
+        hide: "Masquer",
+        hideTitle: "Masquer le document",
+        hideDescription:
+          "Le document « {title} » ne sera plus visible par les étudiants.",
+        hideConfirm: "Masquer",
+        show: "Afficher",
+        showTitle: "Afficher le document",
+        showDescription:
+          "Le document « {title} » sera de nouveau visible par les étudiants.",
+        showConfirm: "Afficher",
+        statusUpdated: "La visibilité du document a été mise à jour.",
+        delete: "Supprimer",
+        deleteTitle: "Supprimer le document",
+        deleteDescription:
+          "Le document « {title} » et son fichier seront définitivement supprimés.",
+        deleteConfirm: "Supprimer",
+        deleting: "Suppression…",
+        deleted: "Le document a été supprimé.",
+        storageDeleteFailed:
+          "Le fichier n'a pas pu être supprimé. Le document est conservé.",
+        processing: "Traitement…",
+        errors: {
+          forbidden: "Accès refusé.",
+          generic: "Une erreur est survenue. Réessayez.",
+          sessionExpired:
+            "Votre session a expiré. Reconnectez-vous pour continuer.",
+        },
+      },
+      detail: {
+        back: "Retour aux documents",
+        courseLabel: "Cours",
+        categoryLabel: "Catégorie",
+        sizeLabel: "Taille",
+        dateLabel: "Ajouté le",
+        previewTitle: "Aperçu",
+        openInNewTab: "Ouvrir dans un nouvel onglet",
+        previewUnavailable:
+          "L'aperçu n'est pas disponible pour ce format. Téléchargez le fichier pour le consulter.",
+        download: "Télécharger",
+        loadFailed: "Impossible de charger ce document pour le moment.",
+        notFound: "Document introuvable.",
       },
     },
     management: {
