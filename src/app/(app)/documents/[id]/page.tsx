@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CourseComments } from "@/components/comments/course-comments";
 import { Notice } from "@/components/notice";
 import { fr } from "@/content/fr";
-import { getVisibleDocument } from "@/lib/documents/data";
+import { getCurrentUser } from "@/lib/auth/session";
+import {
+  getCommentAuthorsForCourses,
+  getCourseComments,
+} from "@/lib/comments/data";
+import { canUploadToCourse, getVisibleDocument } from "@/lib/documents/data";
 import {
   categoryLabel,
   fileTypeLabel,
@@ -13,7 +19,26 @@ import {
 
 type DocumentDetailPageProps = {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ qpage?: string | string[] }>;
 };
+
+const COMMENTS_PAGE_SIZE = 20;
+
+function readSearchParam(value: string | string[] | undefined): string {
+  return typeof value === "string" ? value : "";
+}
+
+function parsePage(value: string): number {
+  const parsed = Number.parseInt(value, 10);
+
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
+}
+
+function buildCommentsHref(documentId: string, page: number): string {
+  return page > 1
+    ? `/documents/${documentId}?qpage=${page}`
+    : `/documents/${documentId}`;
+}
 
 export async function generateMetadata({
   params,
@@ -38,8 +63,13 @@ function isImage(mimeType: string): boolean {
 
 export default async function DocumentDetailPage({
   params,
+  searchParams,
 }: DocumentDetailPageProps) {
   const { id } = await params;
+  const queryParams = await searchParams;
+  const requestedCommentsPage = parsePage(
+    readSearchParam(queryParams.qpage),
+  );
   const { document, error } = await getVisibleDocument(id);
   const labels = fr.app.documents;
   const detail = labels.detail;
@@ -55,6 +85,23 @@ export default async function DocumentDetailPage({
   if (!document) {
     notFound();
   }
+
+  const [canModerate, user, commentsResult] = await Promise.all([
+    canUploadToCourse(document.courseId),
+    getCurrentUser(),
+    getCourseComments({
+      courseId: document.courseId,
+      documentId: document.id,
+      page: requestedCommentsPage,
+      pageSize: COMMENTS_PAGE_SIZE,
+    }),
+  ]);
+  const authors = await getCommentAuthorsForCourses([document.courseId]);
+  const commentsTotalPages = Math.max(
+    1,
+    Math.ceil(commentsResult.total / COMMENTS_PAGE_SIZE),
+  );
+  const commentsPage = Math.min(requestedCommentsPage, commentsTotalPages);
 
   const fileUrl = `/documents/${document.id}/fichier?mode=view`;
   const downloadUrl = `/documents/${document.id}/fichier?mode=download`;
@@ -173,6 +220,40 @@ export default async function DocumentDetailPage({
           <p className="mt-3 rounded-xl border border-dashed border-primary/20 bg-background px-4 py-6 text-center text-sm leading-6 text-slate-600">
             {detail.previewUnavailable}
           </p>
+        )}
+      </section>
+
+      <section className="mt-6 rounded-2xl border border-primary/10 bg-white p-6 shadow-sm">
+        {commentsResult.error ? (
+          <Notice tone="error">{fr.app.comments.loadFailed}</Notice>
+        ) : (
+          <CourseComments
+            courseId={document.courseId}
+            threads={commentsResult.threads}
+            authors={authors}
+            currentUserId={user?.id ?? ""}
+            canModerate={canModerate}
+            contextOptions={[]}
+            fixedContext={{
+              type: "document",
+              id: document.id,
+              title: document.title,
+            }}
+            heading={fr.app.comments.sectionTitle}
+            description={fr.app.comments.documentSectionDescription}
+            pagination={{
+              currentPage: commentsPage,
+              totalPages: commentsTotalPages,
+              previousHref:
+                commentsPage > 1
+                  ? buildCommentsHref(document.id, commentsPage - 1)
+                  : null,
+              nextHref:
+                commentsPage < commentsTotalPages
+                  ? buildCommentsHref(document.id, commentsPage + 1)
+                  : null,
+            }}
+          />
         )}
       </section>
     </article>

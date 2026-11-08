@@ -1,16 +1,40 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CourseComments } from "@/components/comments/course-comments";
 import { Notice } from "@/components/notice";
 import { fr } from "@/content/fr";
+import { getCurrentUser } from "@/lib/auth/session";
+import {
+  getCommentAuthorsForCourses,
+  getCourseComments,
+} from "@/lib/comments/data";
+import { canUploadToCourse } from "@/lib/documents/data";
+import { categoryLabel } from "@/lib/documents/format";
 import { getVisibleDriveLink } from "@/lib/drive/data";
 import { driveKindLabel } from "@/lib/drive/format";
 import { embedUrl, openUrl } from "@/lib/drive/links";
-import { categoryLabel } from "@/lib/documents/format";
 
 type DriveLinkPageProps = {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ qpage?: string | string[] }>;
 };
+
+const COMMENTS_PAGE_SIZE = 20;
+
+function readSearchParam(value: string | string[] | undefined): string {
+  return typeof value === "string" ? value : "";
+}
+
+function parsePage(value: string): number {
+  const parsed = Number.parseInt(value, 10);
+
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
+}
+
+function buildCommentsHref(linkId: string, page: number): string {
+  return page > 1 ? `/liens/${linkId}?qpage=${page}` : `/liens/${linkId}`;
+}
 
 export async function generateMetadata({
   params,
@@ -25,8 +49,15 @@ export async function generateMetadata({
   };
 }
 
-export default async function DriveLinkPage({ params }: DriveLinkPageProps) {
+export default async function DriveLinkPage({
+  params,
+  searchParams,
+}: DriveLinkPageProps) {
   const { id } = await params;
+  const queryParams = await searchParams;
+  const requestedCommentsPage = parsePage(
+    readSearchParam(queryParams.qpage),
+  );
   const { link, error } = await getVisibleDriveLink(id);
   const labels = fr.app.driveLinks;
   const detail = labels.detail;
@@ -42,6 +73,23 @@ export default async function DriveLinkPage({ params }: DriveLinkPageProps) {
   if (!link) {
     notFound();
   }
+
+  const [canModerate, user, commentsResult] = await Promise.all([
+    canUploadToCourse(link.courseId),
+    getCurrentUser(),
+    getCourseComments({
+      courseId: link.courseId,
+      driveLinkId: link.id,
+      page: requestedCommentsPage,
+      pageSize: COMMENTS_PAGE_SIZE,
+    }),
+  ]);
+  const authors = await getCommentAuthorsForCourses([link.courseId]);
+  const commentsTotalPages = Math.max(
+    1,
+    Math.ceil(commentsResult.total / COMMENTS_PAGE_SIZE),
+  );
+  const commentsPage = Math.min(requestedCommentsPage, commentsTotalPages);
 
   return (
     <article className="mx-auto w-full max-w-4xl">
@@ -120,6 +168,40 @@ export default async function DriveLinkPage({ params }: DriveLinkPageProps) {
         >
           {detail.openDrive}
         </a>
+      </section>
+
+      <section className="mt-6 rounded-2xl border border-primary/10 bg-white p-6 shadow-sm">
+        {commentsResult.error ? (
+          <Notice tone="error">{fr.app.comments.loadFailed}</Notice>
+        ) : (
+          <CourseComments
+            courseId={link.courseId}
+            threads={commentsResult.threads}
+            authors={authors}
+            currentUserId={user?.id ?? ""}
+            canModerate={canModerate}
+            contextOptions={[]}
+            fixedContext={{
+              type: "drive",
+              id: link.id,
+              title: link.title,
+            }}
+            heading={fr.app.comments.sectionTitle}
+            description={fr.app.comments.driveSectionDescription}
+            pagination={{
+              currentPage: commentsPage,
+              totalPages: commentsTotalPages,
+              previousHref:
+                commentsPage > 1
+                  ? buildCommentsHref(link.id, commentsPage - 1)
+                  : null,
+              nextHref:
+                commentsPage < commentsTotalPages
+                  ? buildCommentsHref(link.id, commentsPage + 1)
+                  : null,
+            }}
+          />
+        )}
       </section>
     </article>
   );

@@ -1,13 +1,22 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CourseComments } from "@/components/comments/course-comments";
 import { DocumentManagement } from "@/components/documents/document-management";
 import { DocumentUploadForm } from "@/components/documents/document-upload-form";
 import { DriveLinkForm } from "@/components/drive/drive-link-form";
 import { DriveLinkManagement } from "@/components/drive/drive-link-management";
 import { FeedbackProvider } from "@/components/management/feedback";
 import { Notice } from "@/components/notice";
+import { VideoForm } from "@/components/videos/video-form";
+import { VideoManagement } from "@/components/videos/video-management";
 import { fr } from "@/content/fr";
+import { getCurrentUser } from "@/lib/auth/session";
+import {
+  getCommentAuthorsForCourses,
+  getCommentContextOptions,
+  getCourseComments,
+} from "@/lib/comments/data";
 import {
   canUploadToCourse,
   getCourseDocuments,
@@ -16,6 +25,9 @@ import { getCourseDriveLinks } from "@/lib/drive/data";
 import { driveKindLabel } from "@/lib/drive/format";
 import { openUrl } from "@/lib/drive/links";
 import { getVisibleCourse } from "@/lib/management/course-data";
+import { getCourseVideos } from "@/lib/videos/data";
+import { videoKindLabel } from "@/lib/videos/format";
+import { openUrl as youtubeOpenUrl } from "@/lib/youtube/links";
 import {
   categoryLabel,
   fileTypeLabel,
@@ -33,11 +45,20 @@ type CourseDetailPageProps = {
   searchParams: Promise<{
     categorie?: string | string[];
     q?: string | string[];
+    qpage?: string | string[];
   }>;
 };
 
+const COMMENTS_PAGE_SIZE = 20;
+
 function readSearchParam(value: string | string[] | undefined): string {
   return typeof value === "string" ? value : "";
+}
+
+function parsePage(value: string): number {
+  const parsed = Number.parseInt(value, 10);
+
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
 }
 
 export async function generateMetadata({
@@ -64,23 +85,41 @@ export default async function CourseDetailPage({
   const categoryParam = readSearchParam(queryParams.categorie).trim();
   const category = isDocumentCategory(categoryParam) ? categoryParam : null;
   const query = readSearchParam(queryParams.q).trim().slice(0, 100);
+  const requestedCommentsPage = parsePage(
+    readSearchParam(queryParams.qpage),
+  );
 
   const [
     { course, error },
     canUpload,
     documentsResult,
     driveLinksResult,
+    videosResult,
+    commentsResult,
+    contextOptions,
+    user,
   ] = await Promise.all([
     getVisibleCourse(id),
     canUploadToCourse(id),
     getCourseDocuments(id),
     getCourseDriveLinks(id),
+    getCourseVideos(id),
+    getCourseComments({
+      courseId: id,
+      page: requestedCommentsPage,
+      pageSize: COMMENTS_PAGE_SIZE,
+    }),
+    getCommentContextOptions(id),
+    getCurrentUser(),
   ]);
+  const authors = await getCommentAuthorsForCourses([id]);
 
   const labels = fr.app.courses;
   const detail = labels.detail;
   const documentLabels = fr.app.documents;
   const driveLabels = fr.app.driveLinks;
+  const videoLabels = fr.app.videos;
+  const commentLabels = fr.app.comments;
 
   if (error) {
     return (
@@ -107,16 +146,33 @@ export default async function CourseDetailPage({
     return normalizeForSearch(document.title).includes(normalizedQuery);
   });
   const hasFilters = Boolean(category || query);
-  const comingSoonSections = [
-    {
-      title: detail.videosTitle,
-      description: detail.videosDescription,
-    },
-    {
-      title: detail.questionsTitle,
-      description: detail.questionsDescription,
-    },
-  ];
+  const commentsTotalPages = Math.max(
+    1,
+    Math.ceil(commentsResult.total / COMMENTS_PAGE_SIZE),
+  );
+  const commentsCurrentPage = Math.min(
+    requestedCommentsPage,
+    commentsTotalPages,
+  );
+  const buildCommentsHref = (page: number): string => {
+    const params = new URLSearchParams();
+
+    if (category) {
+      params.set("categorie", category);
+    }
+
+    if (query) {
+      params.set("q", query);
+    }
+
+    if (page > 1) {
+      params.set("qpage", String(page));
+    }
+
+    const queryString = params.toString();
+
+    return queryString ? `/cours/${id}?${queryString}` : `/cours/${id}`;
+  };
 
   return (
     <article className="mx-auto w-full max-w-4xl">
@@ -417,26 +473,120 @@ export default async function CourseDetailPage({
         </div>
       </section>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2">
-        {comingSoonSections.map((section) => (
-          <section
-            key={section.title}
-            className="rounded-2xl border border-primary/10 bg-white p-5 shadow-sm"
-          >
-            <div className="flex flex-wrap items-start justify-between gap-2">
-              <h2 className="text-base font-semibold text-primary">
-                {section.title}
-              </h2>
-              <span className="inline-flex shrink-0 items-center rounded-full border border-accent/30 bg-accent/10 px-2.5 py-1 text-xs font-semibold text-primary">
-                {fr.common.comingSoon}
-              </span>
-            </div>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
-              {section.description}
-            </p>
-          </section>
-        ))}
-      </div>
+      <section className="mt-6 rounded-2xl border border-primary/10 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-semibold tracking-tight text-primary">
+          {videoLabels.sectionTitle}
+        </h2>
+        <p className="mt-1 text-sm leading-6 text-slate-600">
+          {videoLabels.sectionDescription}
+        </p>
+
+        {canUpload ? <VideoForm courseId={id} /> : null}
+
+        {videosResult.error ? (
+          <Notice tone="error">{videoLabels.list.loadFailed}</Notice>
+        ) : videosResult.videos.length === 0 ? (
+          <p className="mt-5 rounded-xl border border-dashed border-primary/20 bg-background px-4 py-6 text-center text-sm leading-6 text-slate-600">
+            {videoLabels.list.empty}
+          </p>
+        ) : (
+          <FeedbackProvider>
+            <ul className="mt-5 space-y-4">
+              {videosResult.videos.map((video) => (
+                <li
+                  key={video.id}
+                  className="rounded-2xl border border-primary/10 bg-background p-4"
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-base font-semibold text-primary">
+                          {video.title}
+                        </h3>
+                        {video.status === "rejected" ? (
+                          <span className="inline-flex items-center rounded-full border border-amber-300 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-900">
+                            {videoLabels.status.rejected}
+                          </span>
+                        ) : null}
+                      </div>
+
+                      <p className="mt-1 flex flex-wrap items-center gap-2 text-xs leading-5 text-slate-600">
+                        <span>{videoKindLabel(video.kind)}</span>
+                        <span aria-hidden="true">·</span>
+                        <span>{formatDate(video.createdAt)}</span>
+                      </p>
+
+                      {video.description ? (
+                        <p className="mt-2 text-sm leading-6 whitespace-pre-line text-slate-600">
+                          {video.description}
+                        </p>
+                      ) : null}
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Link
+                        href={`/videos/${video.id}`}
+                        className="inline-flex min-h-9 items-center justify-center rounded-lg border border-primary/20 bg-white px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                      >
+                        {videoLabels.actions.watch}
+                      </Link>
+                      <a
+                        href={youtubeOpenUrl(video.kind, video.youtubeId)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex min-h-9 items-center justify-center rounded-lg border border-primary/20 bg-white px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                      >
+                        {videoLabels.actions.openYoutube}
+                      </a>
+                    </div>
+                  </div>
+
+                  {canUpload ? (
+                    <VideoManagement
+                      videoId={video.id}
+                      title={video.title}
+                      description={video.description}
+                      position={video.position}
+                      status={video.status}
+                    />
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </FeedbackProvider>
+        )}
+      </section>
+
+      <section className="mt-6 rounded-2xl border border-primary/10 bg-white p-6 shadow-sm">
+        {commentsResult.error ? (
+          <Notice tone="error">{commentLabels.loadFailed}</Notice>
+        ) : (
+          <CourseComments
+            courseId={id}
+            threads={commentsResult.threads}
+            authors={authors}
+            currentUserId={user?.id ?? ""}
+            canModerate={canUpload}
+            contextOptions={contextOptions}
+            fixedContext={null}
+            heading={commentLabels.sectionTitle}
+            description={commentLabels.sectionDescription}
+            anchorPrefix="question-"
+            pagination={{
+              currentPage: commentsCurrentPage,
+              totalPages: commentsTotalPages,
+              previousHref:
+                commentsCurrentPage > 1
+                  ? buildCommentsHref(commentsCurrentPage - 1)
+                  : null,
+              nextHref:
+                commentsCurrentPage < commentsTotalPages
+                  ? buildCommentsHref(commentsCurrentPage + 1)
+                  : null,
+            }}
+          />
+        )}
+      </section>
     </article>
   );
 }

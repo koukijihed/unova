@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test:drive-links": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-drive-links.mjs",
+    "test:youtube-links": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test scripts/test-youtube-links.mjs",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",

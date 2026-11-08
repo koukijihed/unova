@@ -2,6 +2,7 @@ import {
   DRIVE_KIND_LABELS,
   DRIVE_URL_ERROR,
 } from "@/lib/drive/links";
+import { YOUTUBE_URL_ERROR } from "@/lib/youtube/links";
 
 export const fr = {
   site: {
@@ -368,6 +369,16 @@ export const fr = {
           description:
             "Consultez et téléchargez les documents de vos cours.",
         },
+        videos: {
+          title: "Vidéos",
+          description:
+            "Regardez les vidéos et playlists YouTube de vos cours.",
+        },
+        questions: {
+          title: "Questions-Réponses",
+          description:
+            "Posez vos questions et échangez avec vos enseignants.",
+        },
         management: {
           title: "Gestion",
           description:
@@ -401,7 +412,7 @@ export const fr = {
         videos: {
           title: "Vidéos",
           description:
-            "Les vidéos pédagogiques seront regroupées dans cet espace.",
+            "Consultez les vidéos et playlists YouTube de vos cours.",
         },
         schedules: {
           title: "Emplois du temps",
@@ -411,7 +422,7 @@ export const fr = {
         questions: {
           title: "Questions-Réponses",
           description:
-            "Cet espace permettra d'échanger des questions et des réponses.",
+            "Posez vos questions et échangez avec les enseignants et les étudiants.",
         },
       },
     },
@@ -698,6 +709,286 @@ export const fr = {
         loadFailed: "Impossible de charger ce lien pour le moment.",
         notFound: "Lien introuvable.",
         iframeTitle: "Aperçu Google Drive : {title}",
+      },
+    },
+    videos: {
+      metadataTitle: "Vidéos — UNOVA",
+      eyebrow: "Espace académique",
+      title: "Vidéos",
+      description:
+        "Consultez les vidéos et playlists YouTube de vos cours.",
+      kinds: {
+        video: "Vidéo",
+        playlist: "Playlist",
+      },
+      status: {
+        rejected: "Masqué",
+      },
+      actions: {
+        watch: "Regarder",
+        openYoutube: "Ouvrir sur YouTube",
+      },
+      filters: {
+        courseLabel: "Cours",
+        courseAll: "Tous les cours",
+        searchLabel: "Rechercher une vidéo",
+        searchPlaceholder: "Titre de la vidéo",
+        submit: "Filtrer",
+        clear: "Effacer les filtres",
+      },
+      list: {
+        resultsCountOne: "1 vidéo trouvée",
+        resultsCountMany: "{count} vidéos trouvées",
+        empty: "Aucune vidéo disponible.",
+        noResults: "Aucune vidéo ne correspond à votre recherche.",
+        loadFailed: "Impossible de charger les vidéos pour le moment.",
+      },
+      pagination: {
+        previous: "Page précédente",
+        next: "Page suivante",
+        pageInfo: "Page {page} sur {total}",
+      },
+      sectionTitle: "Vidéos",
+      sectionDescription:
+        "Consultez les vidéos et playlists partagées pour ce cours.",
+      add: {
+        title: "Ajouter une vidéo",
+        description:
+          "Collez l'adresse d'une vidéo ou d'une playlist YouTube.",
+        fields: {
+          url: "Lien YouTube",
+          title: "Titre",
+          description: "Description",
+        },
+        urlPlaceholder: "https://www.youtube.com/...",
+        titlePlaceholder: "Ex. : Chapitre 1 — Cours magistral",
+        descriptionPlaceholder: "Description facultative",
+        help: "Collez l'adresse d'une vidéo ou d'une playlist YouTube. La vidéo doit autoriser l'intégration ; sinon utilisez « Ouvrir sur YouTube ».",
+        submit: "Ajouter la vidéo",
+        submitting: "Ajout…",
+        success: "La vidéo a été ajoutée.",
+        errors: {
+          invalidUrl: YOUTUBE_URL_ERROR,
+          titleRequired: "Le titre est obligatoire.",
+          titleTooShort: "Le titre doit contenir au moins 2 caractères.",
+          titleTooLong: "Le titre ne doit pas dépasser 200 caractères.",
+          descriptionTooLong:
+            "La description ne doit pas dépasser 2000 caractères.",
+          invalidPosition:
+            "La position doit être un nombre entier entre 0 et 10000.",
+          duplicate: "Cette vidéo est déjà ajoutée à ce cours.",
+          forbidden: "Accès refusé.",
+          generic: "Une erreur est survenue. Réessayez.",
+          sessionExpired:
+            "Votre session a expiré. Reconnectez-vous pour continuer.",
+        },
+      },
+      management: {
+        edit: "Modifier",
+        editTitle: "Modifier la vidéo",
+        save: "Enregistrer",
+        saving: "Enregistrement…",
+        cancel: "Annuler",
+        updated: "La vidéo a été mise à jour.",
+        positionLabel: "Position",
+        positionHint:
+          "Les vidéos sont classées par position croissante, puis par date.",
+        hide: "Masquer",
+        hideTitle: "Masquer la vidéo",
+        hideDescription:
+          "La vidéo « {title} » ne sera plus visible par les étudiants.",
+        hideConfirm: "Masquer",
+        show: "Afficher",
+        showTitle: "Afficher la vidéo",
+        showDescription:
+          "La vidéo « {title} » sera de nouveau visible par les étudiants.",
+        showConfirm: "Afficher",
+        statusUpdated: "La visibilité de la vidéo a été mise à jour.",
+        delete: "Supprimer",
+        deleteTitle: "Supprimer la vidéo",
+        deleteDescription:
+          "La vidéo « {title} » sera définitivement supprimée.",
+        deleteConfirm: "Supprimer",
+        deleting: "Suppression…",
+        deleted: "La vidéo a été supprimée.",
+        processing: "Traitement…",
+        errors: {
+          forbidden: "Accès refusé.",
+          generic: "Une erreur est survenue. Réessayez.",
+          sessionExpired:
+            "Votre session a expiré. Reconnectez-vous pour continuer.",
+        },
+      },
+      detail: {
+        back: "Retour aux vidéos",
+        courseLabel: "Cours",
+        kindLabel: "Type",
+        dateLabel: "Ajoutée le",
+        previewTitle: "Lecteur",
+        previewUnavailable:
+          "Si la vidéo ne s'affiche pas, son auteur n'autorise peut-être pas l'intégration.",
+        openYoutube: "Ouvrir sur YouTube",
+        loadFailed: "Impossible de charger cette vidéo pour le moment.",
+        notFound: "Vidéo introuvable.",
+        iframeTitle: "Lecteur YouTube : {title}",
+        questionsTitle: "Questions sur cette vidéo",
+        questionsDescription:
+          "Posez une question ou consultez les échanges liés à cette vidéo.",
+      },
+    },
+    comments: {
+      sectionTitle: "Questions-Réponses",
+      sectionDescription:
+        "Posez vos questions et échangez avec les enseignants et les autres étudiants.",
+      videoSectionDescription:
+        "Posez une question sur cette vidéo ou consultez les échanges.",
+      documentSectionDescription:
+        "Posez une question sur ce document ou consultez les échanges.",
+      driveSectionDescription:
+        "Posez une question sur cette ressource ou consultez les échanges.",
+      empty: "Aucun message pour le moment.",
+      loadFailed:
+        "Impossible de charger les questions et réponses pour le moment.",
+      unknownAuthor: "Utilisateur inconnu",
+      kinds: {
+        comment: "Commentaire",
+        question: "Question",
+      },
+      badges: {
+        teacher: "Enseignant",
+        director: "Directeur",
+        admin: "Administrateur",
+      },
+      newMessage: {
+        title: "Nouveau message",
+        kindLabel: "Type de message",
+        contextLabel: "Contexte (facultatif)",
+        contextNone: "Aucun contexte",
+        contextGroups: {
+          documents: "Documents",
+          videos: "Vidéos",
+          drive: "Liens Google Drive",
+        },
+        bodyLabel: "Message",
+        bodyPlaceholder: "Écrivez votre message…",
+        remaining: "{count} caractères restants",
+        submit: "Publier",
+        submitting: "Publication…",
+      },
+      reply: {
+        action: "Répondre",
+        title: "Répondre",
+        placeholder: "Votre réponse…",
+        submit: "Répondre",
+        submitting: "Envoi…",
+        cancel: "Annuler",
+      },
+      message: {
+        context: "Contexte : {type} — {title}",
+        contextTypes: {
+          document: "Document",
+          video: "Vidéo",
+          drive: "Lien Google Drive",
+        },
+        resolved: "Résolue",
+        hidden: "Masqué",
+        edited: "modifié",
+        repliesOne: "1 réponse",
+        repliesMany: "{count} réponses",
+        noReplies: "Aucune réponse",
+        edit: "Modifier",
+        editTitle: "Modifier le message",
+        save: "Enregistrer",
+        saving: "Enregistrement…",
+        cancel: "Annuler",
+        resolve: "Marquer comme résolue",
+        resolveTitle: "Marquer comme résolue",
+        resolveDescription:
+          "La question « {excerpt} » sera marquée comme résolue.",
+        resolveConfirm: "Marquer comme résolue",
+        reopen: "Rouvrir",
+        reopenTitle: "Rouvrir la question",
+        reopenDescription:
+          "La question « {excerpt} » sera de nouveau ouverte.",
+        reopenConfirm: "Rouvrir",
+        hide: "Masquer",
+        hideTitle: "Masquer le message",
+        hideDescription:
+          "Le message de {name} ne sera plus visible par les étudiants.",
+        hideConfirm: "Masquer",
+        show: "Afficher",
+        showTitle: "Afficher le message",
+        showDescription:
+          "Le message de {name} sera de nouveau visible.",
+        showConfirm: "Afficher",
+        delete: "Supprimer",
+        deleteTitle: "Supprimer le message",
+        deleteDescription:
+          "Le message de {name} sera définitivement supprimé. Les réponses éventuelles seront aussi supprimées.",
+        deleteConfirm: "Supprimer",
+        deleting: "Suppression…",
+        processing: "Traitement…",
+      },
+      errors: {
+        tooMany: "Vous envoyez trop de messages. Patientez une minute.",
+        forbidden: "Accès refusé.",
+        generic: "Une erreur est survenue. Réessayez.",
+        sessionExpired:
+          "Votre session a expiré. Reconnectez-vous pour continuer.",
+        bodyRequired: "Le message est obligatoire.",
+        bodyTooLong: "Le message ne doit pas dépasser 2000 caractères.",
+        invalidKind: "Le type de message est invalide.",
+        invalidContext: "Le contexte sélectionné est invalide.",
+      },
+      messages: {
+        posted: "Votre message a été publié.",
+        replied: "Votre réponse a été publiée.",
+        edited: "Le message a été mis à jour.",
+        resolved: "L'état de la question a été mis à jour.",
+        hidden: "La visibilité du message a été mise à jour.",
+        deleted: "Le message a été supprimé.",
+      },
+      pagination: {
+        previous: "Page précédente",
+        next: "Page suivante",
+        pageInfo: "Page {page} sur {total}",
+      },
+    },
+    questions: {
+      metadataTitle: "Questions-Réponses — UNOVA",
+      eyebrow: "Espace académique",
+      title: "Questions-Réponses",
+      description:
+        "Parcourez les questions récentes des cours auxquels vous avez accès.",
+      filters: {
+        courseLabel: "Cours",
+        courseAll: "Tous les cours",
+        stateLabel: "État",
+        stateAll: "Toutes",
+        stateOpen: "Ouvertes",
+        stateResolved: "Résolues",
+        searchLabel: "Rechercher une question",
+        searchPlaceholder: "Mots-clés",
+        submit: "Filtrer",
+        clear: "Effacer les filtres",
+      },
+      list: {
+        resultsCountOne: "1 question trouvée",
+        resultsCountMany: "{count} questions trouvées",
+        empty: "Aucune question pour le moment.",
+        noResults: "Aucune question ne correspond à votre recherche.",
+        loadFailed:
+          "Impossible de charger les questions pour le moment.",
+        repliesOne: "1 réponse",
+        repliesMany: "{count} réponses",
+        resolved: "Résolue",
+        hidden: "Masqué",
+        openLink: "Voir la question",
+      },
+      pagination: {
+        previous: "Page précédente",
+        next: "Page suivante",
+        pageInfo: "Page {page} sur {total}",
       },
     },
     management: {

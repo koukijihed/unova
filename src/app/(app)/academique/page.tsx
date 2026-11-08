@@ -19,9 +19,13 @@ export default function AcademicPage() {
     { key: "programs", ...labels.modules.programs, href: "/programmes" },
     { key: "courses", ...labels.modules.courses },
     { key: "documents", ...labels.modules.documents, href: "/documents" },
-    { key: "videos", ...labels.modules.videos },
+    { key: "videos", ...labels.modules.videos, href: "/videos" },
     { key: "schedules", ...labels.modules.schedules },
-    { key: "questions", ...labels.modules.questions },
+    {
+      key: "questions",
+      ...labels.modules.questions,
+      href: "/questions-reponses",
+    },
   ];
 
   return (

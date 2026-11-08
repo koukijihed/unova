@@ -89,6 +89,16 @@ export default async function DashboardPage() {
       href: "/documents",
       ...quickAccessLabels.documents,
     },
+    {
+      key: "videos",
+      href: "/videos",
+      ...quickAccessLabels.videos,
+    },
+    {
+      key: "questions",
+      href: "/questions-reponses",
+      ...quickAccessLabels.questions,
+    },
     ...(canManage
       ? [
           {
