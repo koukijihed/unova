@@ -34,10 +34,19 @@ export async function getTeachers(): Promise<ManagementTeachersResult> {
   const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase
     .from("user_roles")
-    .select("user_id, profiles(first_name, last_name)")
+    // `user_roles` has two foreign keys to `profiles` (`user_id` and
+    // `granted_by`), so the embed must be disambiguated by foreign key column.
+    .select("user_id, profiles!user_id(first_name, last_name)")
     .eq("role_code", "teacher");
 
   if (error) {
+    console.error("getTeachers: user_roles with profiles embed failed", {
+      code: error.code,
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+    });
+
     return { teachers: [], error: true };
   }
 
