@@ -38,6 +38,10 @@ Dernière mise à jour : 9 novembre 2026
 - Questions-Réponses par cours : messages de type question ou commentaire, réponses sur un seul niveau, avatars signés avec repli sur les initiales, badges Enseignant/Directeur/Administrateur, contexte facultatif (document, vidéo ou lien Drive), états « Résolue » et « Masqué », modification et suppression par l'auteur, résolution par l'auteur ou l'équipe pédagogique, masquage/affichage et suppression par l'équipe, limite de 10 messages par minute, pagination de 20 (`?qpage=`). Composant réutilisé sur `/cours/[id]`, `/videos/[id]`, `/documents/[id]` et `/liens/[id]`. Page `/questions-reponses` avec filtres `?cours=`, `?etat=ouvertes|resolues`, `?q=` insensible aux accents et pagination de 20.
 - Salles `/gestion/salles` (administrateur uniquement) : liste, création (nom de 1 à 60 caractères, capacité facultative de 1 à 1000), modification et activation/désactivation sans suppression, avec l'erreur « Une salle porte déjà ce nom. ».
 - Emplois du temps manuels `/gestion/emplois-du-temps` (administrateurs et directeurs) : sélection de la classe et du semestre (1 ou 2), grille hebdomadaire du lundi au samedi de 08:00 à 19:00, séances positionnées avec cours, type (Cours/TD/TP), groupe, horaire, salle, enseignant et badge « Brouillon » ou « Publié », formulaire d'ajout et de modification (cours de la classe, enseignants du cours, salles actives), suppression avec confirmation native, détection des conflits (classe ou groupe, enseignant, salle) avec messages en français, et publication/dépublication du semestre via `set_timetable_status` avec confirmation et compteurs.
+- Disponibilités des enseignants `/disponibilites` (enseignants, administrateurs autorisés) : gestion de ses propres indisponibilités (jour, début et fin par pas de 15 minutes, note facultative de 200 caractères), ajout, modification et suppression avec confirmation native `<dialog>`, grille hebdomadaire et liste, avec explication que le générateur évite ces créneaux mais qu'une modification manuelle peut les chevaucher.
+- Besoins horaires des cours dans `/gestion/cours` (administrateurs et directeurs) : par cours, type de séance, groupe facultatif, séances par semaine (1 à 6), durée en minutes (30 à 240, multiple de 15, choix rapides 60/90/120), enseignant du cours (par défaut le premier enseignant) et salle préférée parmi les salles actives, avec ajout, modification, suppression, résumé « Heures par semaine : X h » et erreur « Un besoin identique existe déjà pour ce cours. ».
+- Génération automatique des emplois du temps en brouillon `/gestion/emplois-du-temps` (administrateurs et directeurs) : paramètres (jours du lundi au samedi, début et fin de journée, pause déjeuner facultative), rappel des besoins horaires avec séances déjà présentes, confirmation native, rapport de génération (placées, brouillons remplacés, conservées, placées sans salle, non placées), annulation d'une génération avec compteur calculé par la base, historique des générations, verrouillage individuel ou global des brouillons, badges « Verrouillé » et « Généré », et refus de régénérer un semestre publié.
+- Logique de calcul de l'avancement des besoins horaires dans `src/lib/timetable/requirements.ts` (séances restantes, total hebdomadaire, groupes comparés sans casse), couverte par l'auto-test `npm run test:timetable-requirements`.
 - Consultation des emplois du temps `/emplois-du-temps` : étudiants (séances publiées de leur classe acceptée), enseignants (séances publiées dont ils sont responsables ou enseignants du cours), administrateurs et directeurs (choix de la classe, filtres groupe/enseignant/salle, brouillons visibles), grille sur ordinateur, liste par jour sur mobile, noms de jours et horaires en français, et bouton « Imprimer » avec feuille de style paysage.
 - Logique de disposition de la grille dans `src/lib/timetable/layout.ts` (positionnement vertical et colonnes pour les chevauchements), couverte par l'auto-test `npm run test:timetable-layout`.
 - Tableau de bord avec le message « Bonjour, <prénom> » et notices d'inscription : aucun profil étudiant (lien vers `/verification`), en attente, acceptée, refusée, interrompue ou terminée.
@@ -71,10 +75,10 @@ Dernière mise à jour : 9 novembre 2026
 - Aperçu des fichiers Word, PowerPoint et Excel dans le navigateur.
 - Notifications des réponses aux questions.
 - Questions anonymes.
-- Disponibilités des enseignants.
-- Génération automatique des emplois du temps avec séances verrouillées.
 - Gestion des jours fériés.
+- Disponibilités des salles.
 - Notifications lors des changements d'emploi du temps.
+- Cours mutualisés entre plusieurs classes.
 - Export calendrier des emplois du temps.
 - Nettoyage des fichiers orphelins dans le bucket `documents`.
 - Suivi de l'espace de stockage utilisé.
@@ -88,7 +92,7 @@ Dernière mise à jour : 9 novembre 2026
 
 ## Limites actuelles
 
-- L'acceptation des inscriptions, la gestion des enseignants, des cours, de la structure académique, des salles et des emplois du temps manuels sont disponibles ; la génération automatique reste à venir.
+- L'acceptation des inscriptions, la gestion des enseignants, des cours, de la structure académique, des salles et des emplois du temps manuels sont disponibles, ainsi que les disponibilités des enseignants, les besoins horaires et la génération automatique de brouillons.
 - L'import de la liste officielle se fait uniquement en ligne de commande ; aucune page d'administration n'est encore proposée.
 - L'espace applicatif est protégé, mais plusieurs de ses pages métier restent des pages d'attente.
 - Aucune donnée académique, aucun utilisateur fictif et aucune statistique ne sont affichés.
@@ -109,3 +113,7 @@ Dernière mise à jour : 9 novembre 2026
 - Le semestre d'un emploi du temps est le semestre de l'année universitaire (1 ou 2).
 - La publication des emplois du temps s'effectue par classe et par semestre.
 - Aucune exception n'est encore gérée pour les jours fériés ou les séances ponctuelles.
+- L'algorithme de génération est glouton : il produit une solution correcte mais pas nécessairement optimale.
+- Les séances qui n'ont pas pu être placées doivent être ajoutées à la main après la génération.
+- La génération refuse les semestres publiés ; il faut les dépublier avant de régénérer.
+- Les indisponibilités des enseignants ne sont respectées que par le générateur : une modification manuelle de l'emploi du temps peut les chevaucher.

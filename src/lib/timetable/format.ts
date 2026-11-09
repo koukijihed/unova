@@ -44,3 +44,11 @@ export function semesterLabel(semester: number): string {
     ? fr.app.timetable.semesters.second
     : fr.app.timetable.semesters.first;
 }
+
+export function formatWeeklyHours(minutes: number): string {
+  const hours = Number.isFinite(minutes) ? minutes / 60 : 0;
+
+  return new Intl.NumberFormat("fr-FR", {
+    maximumFractionDigits: 2,
+  }).format(hours);
+}

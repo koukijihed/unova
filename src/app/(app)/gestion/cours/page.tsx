@@ -8,6 +8,8 @@ import { getCurrentRoles } from "@/lib/auth/session";
 import { getClassCourses } from "@/lib/management/course-data";
 import { getManagementClasses } from "@/lib/management/data";
 import type { ManagementCourse } from "@/lib/management/course-data";
+import { getClassRequirements, getRooms } from "@/lib/timetable/data";
+import type { CourseRequirement, Room } from "@/lib/timetable/types";
 
 export const metadata = {
   title: fr.app.management.courses.metadataTitle,
@@ -42,11 +44,25 @@ export default async function CoursesManagementPage({
 
   let courses: ManagementCourse[] = [];
   let coursesError = false;
+  let requirements: CourseRequirement[] = [];
+  let rooms: Room[] = [];
+  let requirementsError = false;
+  let roomsError = false;
 
   if (selectedClass) {
-    const result = await getClassCourses(selectedClass.id);
-    courses = result.courses;
-    coursesError = result.error;
+    const [coursesResult, requirementsResult, roomsResult] =
+      await Promise.all([
+        getClassCourses(selectedClass.id),
+        getClassRequirements(selectedClass.id),
+        getRooms(),
+      ]);
+
+    courses = coursesResult.courses;
+    coursesError = coursesResult.error;
+    requirements = requirementsResult.requirements;
+    requirementsError = requirementsResult.error;
+    rooms = roomsResult.rooms;
+    roomsError = roomsResult.error;
   }
 
   const labels = fr.app.management.courses;
@@ -126,14 +142,30 @@ export default async function CoursesManagementPage({
                 <Notice tone="error">
                   <p>{labels.coursesLoadFailed}</p>
                 </Notice>
-              ) : (
+              ) : null}
+
+              {requirementsError ? (
+                <Notice tone="error">
+                  <p>{fr.app.timetable.requirements.loadFailed}</p>
+                </Notice>
+              ) : null}
+
+              {roomsError ? (
+                <Notice tone="error">
+                  <p>{fr.app.timetable.management.roomsLoadFailed}</p>
+                </Notice>
+              ) : null}
+
+              {!coursesError && !requirementsError && !roomsError ? (
                 <FeedbackProvider>
                   <CourseManager
                     classId={selectedClass.id}
                     courses={courses}
+                    requirements={requirements}
+                    rooms={rooms}
                   />
                 </FeedbackProvider>
-              )}
+              ) : null}
             </>
           ) : invalidClass ? null : (
             <Notice tone="info">

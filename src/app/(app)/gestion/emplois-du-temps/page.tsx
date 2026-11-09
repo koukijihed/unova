@@ -7,14 +7,18 @@ import { hasManagementRole } from "@/lib/auth/roles";
 import { getCurrentRoles } from "@/lib/auth/session";
 import { getManagementClasses } from "@/lib/management/data";
 import {
+  getClassRequirements,
   getClassTimetable,
   getRooms,
   getTimetableCounts,
   getTimetableCourses,
+  getTimetableGenerations,
 } from "@/lib/timetable/data";
 import type {
+  CourseRequirement,
   Room,
   TimetableCourse,
+  TimetableGeneration,
   TimetableSession,
 } from "@/lib/timetable/types";
 
@@ -55,20 +59,32 @@ export default async function TimetableManagementPage({
   let sessions: TimetableSession[] = [];
   let courses: TimetableCourse[] = [];
   let rooms: Room[] = [];
+  let requirements: CourseRequirement[] = [];
+  let generations: TimetableGeneration[] = [];
   let drafts = 0;
   let published = 0;
   let sessionsError = false;
   let coursesError = false;
   let roomsError = false;
+  let requirementsError = false;
+  let generationsError = false;
 
   if (selectedClass) {
-    const [sessionsResult, coursesResult, roomsResult, countsResult] =
-      await Promise.all([
-        getClassTimetable(selectedClass.id, semester, true),
-        getTimetableCourses(selectedClass.id),
-        getRooms(),
-        getTimetableCounts(selectedClass.id, semester),
-      ]);
+    const [
+      sessionsResult,
+      coursesResult,
+      roomsResult,
+      countsResult,
+      requirementsResult,
+      generationsResult,
+    ] = await Promise.all([
+      getClassTimetable(selectedClass.id, semester, true),
+      getTimetableCourses(selectedClass.id),
+      getRooms(),
+      getTimetableCounts(selectedClass.id, semester),
+      getClassRequirements(selectedClass.id),
+      getTimetableGenerations(selectedClass.id, semester),
+    ]);
 
     sessions = sessionsResult.sessions;
     sessionsError = sessionsResult.error;
@@ -78,6 +94,10 @@ export default async function TimetableManagementPage({
     roomsError = roomsResult.error;
     drafts = countsResult.drafts;
     published = countsResult.published;
+    requirements = requirementsResult.requirements;
+    requirementsError = requirementsResult.error;
+    generations = generationsResult.generations;
+    generationsError = generationsResult.error;
   }
 
   return (
@@ -181,6 +201,12 @@ export default async function TimetableManagementPage({
             </Notice>
           ) : null}
 
+          {requirementsError ? (
+            <Notice tone="error">
+              <p>{fr.app.timetable.requirements.loadFailed}</p>
+            </Notice>
+          ) : null}
+
           {selectedClass ? (
             <>
               <h2 className="mt-8 text-xl font-semibold tracking-tight text-primary">
@@ -195,6 +221,9 @@ export default async function TimetableManagementPage({
                     sessions={sessions}
                     courses={courses}
                     rooms={rooms}
+                    requirements={requirements}
+                    generations={generations}
+                    generationsError={generationsError}
                     drafts={drafts}
                     published={published}
                   />

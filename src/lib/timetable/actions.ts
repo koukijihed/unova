@@ -8,6 +8,7 @@ import { errorState, successState } from "@/lib/management/action-helpers";
 import { isUuid } from "@/lib/management/admin-validation";
 import {
   isForbiddenError,
+  isNotFoundError,
   isUniqueViolation,
   type PostgrestErrorLike,
 } from "@/lib/management/errors";
@@ -16,12 +17,20 @@ import {
   isSessionType,
   isTimetableStatus,
   isWeekday,
+  type TimetableGenerationResult,
+  type TimetableGenerationUnplaced,
 } from "./types";
 
 const LABELS = fr.app.timetable.management;
 const ERRORS = LABELS.errors;
 const ROOMS = fr.app.timetable.rooms;
 const ROOM_ERRORS = ROOMS.errors;
+const REQUIREMENTS = fr.app.timetable.requirements;
+const REQUIREMENT_ERRORS = REQUIREMENTS.errors;
+const AVAILABILITY = fr.app.timetable.availability;
+const AVAILABILITY_ERRORS = AVAILABILITY.errors;
+const GENERATION = fr.app.timetable.generation;
+const GENERATION_ERRORS = GENERATION.errors;
 const ROOM_NAME_MAX = 60;
 const ROOM_CAPACITY_MIN = 1;
 const ROOM_CAPACITY_MAX = 1000;
@@ -580,4 +589,818 @@ export async function setRoomActive(
   revalidateTimetable();
 
   return successState(active ? ROOMS.activated : ROOMS.deactivated);
+}
+
+function revalidateRequirements() {
+  revalidatePath("/gestion/cours");
+  revalidateTimetable();
+}
+
+type RequirementValues = {
+  courseId: string;
+  sessionType: string;
+  groupLabel: string;
+  sessionsPerWeek: string;
+  durationMinutes: string;
+  teacherId: string;
+  preferredRoomId: string;
+};
+
+type RequirementFields = {
+  courseId: string;
+  sessionType: string;
+  groupLabel: string | null;
+  sessionsPerWeek: number;
+  durationMinutes: number;
+  teacherId: string | null;
+  preferredRoomId: string | null;
+  values: RequirementValues;
+};
+
+function readRequirementFields(
+  formData: FormData,
+):
+  | { ok: true; value: RequirementFields }
+  | { ok: false; error: string; values: RequirementValues } {
+  const courseId = readText(formData, "courseId").trim();
+  const sessionType = readText(formData, "sessionType").trim();
+  const groupLabel = readText(formData, "groupLabel").trim();
+  const sessionsPerWeekRaw = readText(formData, "sessionsPerWeek").trim();
+  const durationMinutesRaw = readText(formData, "durationMinutes").trim();
+  const teacherId = readText(formData, "teacherId").trim();
+  const preferredRoomId = readText(formData, "preferredRoomId").trim();
+  const values: RequirementValues = {
+    courseId,
+    sessionType,
+    groupLabel,
+    sessionsPerWeek: sessionsPerWeekRaw,
+    durationMinutes: durationMinutesRaw,
+    teacherId,
+    preferredRoomId,
+  };
+
+  if (!isUuid(courseId)) {
+    return { ok: false, error: REQUIREMENT_ERRORS.courseInvalid, values };
+  }
+
+  if (!isSessionType(sessionType)) {
+    return { ok: false, error: REQUIREMENT_ERRORS.typeInvalid, values };
+  }
+
+  if (groupLabel.length > GROUP_MAX) {
+    return { ok: false, error: REQUIREMENT_ERRORS.groupTooLong, values };
+  }
+
+  const sessionsPerWeek = Number(sessionsPerWeekRaw);
+
+  if (
+    !Number.isInteger(sessionsPerWeek) ||
+    sessionsPerWeek < 1 ||
+    sessionsPerWeek > 6
+  ) {
+    return { ok: false, error: REQUIREMENT_ERRORS.sessionsInvalid, values };
+  }
+
+  const durationMinutes = Number(durationMinutesRaw);
+
+  if (
+    !Number.isInteger(durationMinutes) ||
+    durationMinutes < 30 ||
+    durationMinutes > 240 ||
+    durationMinutes % 15 !== 0
+  ) {
+    return { ok: false, error: REQUIREMENT_ERRORS.durationInvalid, values };
+  }
+
+  if (teacherId && !isUuid(teacherId)) {
+    return { ok: false, error: REQUIREMENT_ERRORS.teacherInvalid, values };
+  }
+
+  if (preferredRoomId && !isUuid(preferredRoomId)) {
+    return { ok: false, error: REQUIREMENT_ERRORS.roomInvalid, values };
+  }
+
+  return {
+    ok: true,
+    value: {
+      courseId,
+      sessionType,
+      groupLabel: groupLabel || null,
+      sessionsPerWeek,
+      durationMinutes,
+      teacherId: teacherId || null,
+      preferredRoomId: preferredRoomId || null,
+      values,
+    },
+  };
+}
+
+function mapRequirementError(error: PostgrestErrorLike | null): string {
+  if (isForbiddenError(error)) {
+    return REQUIREMENT_ERRORS.forbidden;
+  }
+
+  if (isUniqueViolation(error)) {
+    return REQUIREMENT_ERRORS.duplicate;
+  }
+
+  return REQUIREMENT_ERRORS.generic;
+}
+
+export async function createRequirement(
+  _previousState: ManagementActionState,
+  formData: FormData,
+): Promise<ManagementActionState> {
+  const fields = readRequirementFields(formData);
+
+  if (!fields.ok) {
+    return errorState(fields.error, undefined, fields.values);
+  }
+
+  const auth = await getAuthenticatedClient();
+
+  if (!auth) {
+    return errorState(
+      REQUIREMENT_ERRORS.sessionExpired,
+      undefined,
+      fields.value.values,
+    );
+  }
+
+  const { data, error } = await auth.supabase
+    .from("course_requirements")
+    .insert({
+      course_id: fields.value.courseId,
+      session_type: fields.value.sessionType,
+      group_label: fields.value.groupLabel,
+      sessions_per_week: fields.value.sessionsPerWeek,
+      duration_minutes: fields.value.durationMinutes,
+      teacher_id: fields.value.teacherId,
+      preferred_room_id: fields.value.preferredRoomId,
+    })
+    .select("id")
+    .maybeSingle();
+
+  if (error) {
+    logSupabaseError("createRequirement", error);
+    return errorState(
+      mapRequirementError(error),
+      undefined,
+      fields.value.values,
+    );
+  }
+
+  if (!data) {
+    return errorState(
+      REQUIREMENT_ERRORS.forbidden,
+      undefined,
+      fields.value.values,
+    );
+  }
+
+  revalidateRequirements();
+
+  return successState(REQUIREMENTS.created);
+}
+
+export async function updateRequirement(
+  _previousState: ManagementActionState,
+  formData: FormData,
+): Promise<ManagementActionState> {
+  const requirementId = readText(formData, "requirementId").trim();
+  const fields = readRequirementFields(formData);
+
+  if (!isUuid(requirementId)) {
+    return errorState(
+      REQUIREMENT_ERRORS.forbidden,
+      undefined,
+      fields.ok ? fields.value.values : fields.values,
+    );
+  }
+
+  if (!fields.ok) {
+    return errorState(fields.error, undefined, fields.values);
+  }
+
+  const auth = await getAuthenticatedClient();
+
+  if (!auth) {
+    return errorState(
+      REQUIREMENT_ERRORS.sessionExpired,
+      undefined,
+      fields.value.values,
+    );
+  }
+
+  const { data, error } = await auth.supabase
+    .from("course_requirements")
+    .update({
+      session_type: fields.value.sessionType,
+      group_label: fields.value.groupLabel,
+      sessions_per_week: fields.value.sessionsPerWeek,
+      duration_minutes: fields.value.durationMinutes,
+      teacher_id: fields.value.teacherId,
+      preferred_room_id: fields.value.preferredRoomId,
+    })
+    .eq("id", requirementId)
+    .select("id")
+    .maybeSingle();
+
+  if (error) {
+    logSupabaseError("updateRequirement", error);
+    return errorState(
+      mapRequirementError(error),
+      undefined,
+      fields.value.values,
+    );
+  }
+
+  if (!data) {
+    return errorState(
+      REQUIREMENT_ERRORS.forbidden,
+      undefined,
+      fields.value.values,
+    );
+  }
+
+  revalidateRequirements();
+
+  return successState(REQUIREMENTS.updated);
+}
+
+export async function deleteRequirementFormAction(
+  _previousState: ManagementActionState,
+  formData: FormData,
+): Promise<ManagementActionState> {
+  const requirementId = readText(formData, "requirementId").trim();
+
+  if (!isUuid(requirementId)) {
+    return errorState(REQUIREMENT_ERRORS.forbidden);
+  }
+
+  const auth = await getAuthenticatedClient();
+
+  if (!auth) {
+    return errorState(REQUIREMENT_ERRORS.sessionExpired);
+  }
+
+  const { data, error } = await auth.supabase
+    .from("course_requirements")
+    .delete()
+    .eq("id", requirementId)
+    .select("id")
+    .maybeSingle();
+
+  if (error) {
+    logSupabaseError("deleteRequirement", error);
+    return errorState(mapRequirementError(error));
+  }
+
+  if (!data) {
+    return errorState(REQUIREMENT_ERRORS.forbidden);
+  }
+
+  revalidateRequirements();
+
+  return successState(REQUIREMENTS.deleted);
+}
+
+type UnavailabilityValues = {
+  weekday: string;
+  startTime: string;
+  endTime: string;
+  note: string;
+};
+
+type UnavailabilityFields = {
+  weekday: number;
+  startTime: string;
+  endTime: string;
+  note: string | null;
+  values: UnavailabilityValues;
+};
+
+function readUnavailabilityFields(
+  formData: FormData,
+):
+  | { ok: true; value: UnavailabilityFields }
+  | { ok: false; error: string; values: UnavailabilityValues } {
+  const weekdayRaw = readText(formData, "weekday").trim();
+  const startTime = readText(formData, "startTime").trim();
+  const endTime = readText(formData, "endTime").trim();
+  const note = readText(formData, "note").trim();
+  const values: UnavailabilityValues = {
+    weekday: weekdayRaw,
+    startTime,
+    endTime,
+    note,
+  };
+  const weekday = Number(weekdayRaw);
+
+  if (!isWeekday(weekday)) {
+    return { ok: false, error: AVAILABILITY_ERRORS.weekdayInvalid, values };
+  }
+
+  const startMinutes = parseTimeToMinutes(startTime);
+  const endMinutes = parseTimeToMinutes(endTime);
+
+  if (startMinutes === null || endMinutes === null) {
+    return { ok: false, error: AVAILABILITY_ERRORS.timeRequired, values };
+  }
+
+  if (endMinutes <= startMinutes) {
+    return { ok: false, error: AVAILABILITY_ERRORS.timeOrder, values };
+  }
+
+  if (startMinutes % 15 !== 0 || endMinutes % 15 !== 0) {
+    return { ok: false, error: AVAILABILITY_ERRORS.timeStep, values };
+  }
+
+  if (note.length > 200) {
+    return { ok: false, error: AVAILABILITY_ERRORS.noteTooLong, values };
+  }
+
+  return {
+    ok: true,
+    value: {
+      weekday,
+      startTime,
+      endTime,
+      note: note || null,
+      values,
+    },
+  };
+}
+
+function mapUnavailabilityError(error: PostgrestErrorLike | null): string {
+  if (isForbiddenError(error)) {
+    return AVAILABILITY_ERRORS.forbidden;
+  }
+
+  return AVAILABILITY_ERRORS.generic;
+}
+
+function revalidateAvailability() {
+  revalidatePath("/disponibilites");
+  revalidateTimetable();
+}
+
+export async function createUnavailability(
+  _previousState: ManagementActionState,
+  formData: FormData,
+): Promise<ManagementActionState> {
+  const fields = readUnavailabilityFields(formData);
+
+  if (!fields.ok) {
+    return errorState(fields.error, undefined, fields.values);
+  }
+
+  const auth = await getAuthenticatedClient();
+
+  if (!auth) {
+    return errorState(
+      AVAILABILITY_ERRORS.sessionExpired,
+      undefined,
+      fields.value.values,
+    );
+  }
+
+  const { data, error } = await auth.supabase
+    .from("teacher_unavailability")
+    .insert({
+      teacher_id: auth.user.id,
+      weekday: fields.value.weekday,
+      start_time: fields.value.startTime,
+      end_time: fields.value.endTime,
+      note: fields.value.note,
+    })
+    .select("id")
+    .maybeSingle();
+
+  if (error) {
+    logSupabaseError("createUnavailability", error);
+    return errorState(
+      mapUnavailabilityError(error),
+      undefined,
+      fields.value.values,
+    );
+  }
+
+  if (!data) {
+    return errorState(
+      AVAILABILITY_ERRORS.forbidden,
+      undefined,
+      fields.value.values,
+    );
+  }
+
+  revalidateAvailability();
+
+  return successState(AVAILABILITY.created);
+}
+
+export async function updateUnavailability(
+  _previousState: ManagementActionState,
+  formData: FormData,
+): Promise<ManagementActionState> {
+  const unavailabilityId = readText(formData, "unavailabilityId").trim();
+  const fields = readUnavailabilityFields(formData);
+
+  if (!isUuid(unavailabilityId)) {
+    return errorState(
+      AVAILABILITY_ERRORS.forbidden,
+      undefined,
+      fields.ok ? fields.value.values : fields.values,
+    );
+  }
+
+  if (!fields.ok) {
+    return errorState(fields.error, undefined, fields.values);
+  }
+
+  const auth = await getAuthenticatedClient();
+
+  if (!auth) {
+    return errorState(
+      AVAILABILITY_ERRORS.sessionExpired,
+      undefined,
+      fields.value.values,
+    );
+  }
+
+  const { data, error } = await auth.supabase
+    .from("teacher_unavailability")
+    .update({
+      weekday: fields.value.weekday,
+      start_time: fields.value.startTime,
+      end_time: fields.value.endTime,
+      note: fields.value.note,
+    })
+    .eq("id", unavailabilityId)
+    .select("id")
+    .maybeSingle();
+
+  if (error) {
+    logSupabaseError("updateUnavailability", error);
+    return errorState(
+      mapUnavailabilityError(error),
+      undefined,
+      fields.value.values,
+    );
+  }
+
+  if (!data) {
+    return errorState(
+      AVAILABILITY_ERRORS.forbidden,
+      undefined,
+      fields.value.values,
+    );
+  }
+
+  revalidateAvailability();
+
+  return successState(AVAILABILITY.updated);
+}
+
+export async function deleteUnavailabilityFormAction(
+  _previousState: ManagementActionState,
+  formData: FormData,
+): Promise<ManagementActionState> {
+  const unavailabilityId = readText(formData, "unavailabilityId").trim();
+
+  if (!isUuid(unavailabilityId)) {
+    return errorState(AVAILABILITY_ERRORS.forbidden);
+  }
+
+  const auth = await getAuthenticatedClient();
+
+  if (!auth) {
+    return errorState(AVAILABILITY_ERRORS.sessionExpired);
+  }
+
+  const { data, error } = await auth.supabase
+    .from("teacher_unavailability")
+    .delete()
+    .eq("id", unavailabilityId)
+    .select("id")
+    .maybeSingle();
+
+  if (error) {
+    logSupabaseError("deleteUnavailability", error);
+    return errorState(mapUnavailabilityError(error));
+  }
+
+  if (!data) {
+    return errorState(AVAILABILITY_ERRORS.forbidden);
+  }
+
+  revalidateAvailability();
+
+  return successState(AVAILABILITY.deleted);
+}
+
+export async function setSessionLock(
+  entryId: string,
+  locked: boolean,
+): Promise<TimetableActionResult> {
+  const id = String(entryId ?? "").trim();
+
+  if (!isUuid(id)) {
+    return { ok: false, error: ERRORS.forbidden };
+  }
+
+  const auth = await getAuthenticatedClient();
+
+  if (!auth) {
+    return { ok: false, error: ERRORS.sessionExpired };
+  }
+
+  const { data, error } = await auth.supabase
+    .from("timetable_entries")
+    .update({ is_locked: locked })
+    .eq("id", id)
+    .select("id")
+    .maybeSingle();
+
+  if (error) {
+    logSupabaseError("setSessionLock", error);
+    return { ok: false, error: mapTimetableError(error) };
+  }
+
+  if (!data) {
+    return { ok: false, error: ERRORS.forbidden };
+  }
+
+  revalidateTimetable();
+
+  return { ok: true };
+}
+
+export async function lockAllDraftSessionsFormAction(
+  _previousState: ManagementActionState,
+  formData: FormData,
+): Promise<ManagementActionState> {
+  const classId = readText(formData, "classId").trim();
+  const semester = Number(readText(formData, "semester"));
+
+  if (!isUuid(classId) || (semester !== 1 && semester !== 2)) {
+    return errorState(ERRORS.forbidden);
+  }
+
+  const auth = await getAuthenticatedClient();
+
+  if (!auth) {
+    return errorState(ERRORS.sessionExpired);
+  }
+
+  const { data, error } = await auth.supabase
+    .from("timetable_entries")
+    .update({ is_locked: true })
+    .eq("class_id", classId)
+    .eq("semester", semester)
+    .eq("status", "draft")
+    .select("id");
+
+  if (error) {
+    logSupabaseError("lockAllDraftSessions", error);
+    return errorState(mapTimetableError(error));
+  }
+
+  revalidateTimetable();
+
+  return successState(
+    LABELS.lockAllDone.replace("{count}", String(data?.length ?? 0)),
+  );
+}
+
+function parseGenerationUnplaced(
+  value: unknown,
+): TimetableGenerationUnplaced[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.flatMap((item) => {
+    if (!item || typeof item !== "object") {
+      return [];
+    }
+
+    const row = item as Record<string, unknown>;
+    const sessionType =
+      typeof row.session_type === "string" && isSessionType(row.session_type)
+        ? row.session_type
+        : null;
+
+    if (!sessionType) {
+      return [];
+    }
+
+    return [
+      {
+        courseId: typeof row.course_id === "string" ? row.course_id : "",
+        courseName:
+          typeof row.course_name === "string" ? row.course_name : "",
+        sessionType,
+        group: typeof row.group === "string" ? row.group : null,
+        missing: Number(row.missing ?? 0),
+      },
+    ];
+  });
+}
+
+function parseGenerationResult(value: unknown): TimetableGenerationResult {
+  const record =
+    value && typeof value === "object"
+      ? (value as Record<string, unknown>)
+      : {};
+
+  return {
+    placed: Number(record.placed ?? 0),
+    removedDrafts: Number(record.removed_drafts ?? 0),
+    kept: Number(record.kept ?? 0),
+    placedWithoutRoom: Number(record.placed_without_room ?? 0),
+    unplaced: parseGenerationUnplaced(record.unplaced),
+  };
+}
+
+function mapGenerationError(error: PostgrestErrorLike | null): string {
+  if (!error) {
+    return GENERATION_ERRORS.generic;
+  }
+
+  const message = (error.message ?? "").toLowerCase();
+
+  if (message.includes("generation:published")) {
+    return GENERATION_ERRORS.published;
+  }
+
+  if (message.includes("invalid hours")) {
+    return GENERATION_ERRORS.invalidHours;
+  }
+
+  if (message.includes("invalid break")) {
+    return GENERATION_ERRORS.invalidBreak;
+  }
+
+  if (message.includes("invalid days")) {
+    return GENERATION_ERRORS.invalidDays;
+  }
+
+  if (isForbiddenError(error)) {
+    return GENERATION_ERRORS.forbidden;
+  }
+
+  if (
+    error.code === "57014" ||
+    message.includes("statement timeout") ||
+    message.includes("timeout")
+  ) {
+    return GENERATION_ERRORS.timeout;
+  }
+
+  return GENERATION_ERRORS.generic;
+}
+
+export type GenerateTimetableInput = {
+  classId: string;
+  semester: number;
+  days: number[];
+  dayStart: string;
+  dayEnd: string;
+  breakStart: string;
+  breakEnd: string;
+};
+
+export type GenerateTimetableActionResult =
+  | { ok: true; result: TimetableGenerationResult }
+  | { ok: false; error: string };
+
+export async function generateTimetable(
+  input: GenerateTimetableInput,
+): Promise<GenerateTimetableActionResult> {
+  const classId = String(input.classId ?? "").trim();
+  const semester = Number(input.semester);
+  const days = Array.from(
+    new Set(
+      (Array.isArray(input.days) ? input.days : []).map((day) =>
+        Number(day),
+      ),
+    ),
+  )
+    .filter((day) => Number.isInteger(day) && day >= 1 && day <= 6)
+    .sort((a, b) => a - b);
+  const dayStart = String(input.dayStart ?? "").trim();
+  const dayEnd = String(input.dayEnd ?? "").trim();
+  const breakStart = String(input.breakStart ?? "").trim();
+  const breakEnd = String(input.breakEnd ?? "").trim();
+
+  if (!isUuid(classId) || (semester !== 1 && semester !== 2)) {
+    return { ok: false, error: GENERATION_ERRORS.forbidden };
+  }
+
+  if (days.length === 0) {
+    return { ok: false, error: GENERATION_ERRORS.invalidDays };
+  }
+
+  const startMinutes = parseTimeToMinutes(dayStart);
+  const endMinutes = parseTimeToMinutes(dayEnd);
+
+  if (
+    startMinutes === null ||
+    endMinutes === null ||
+    endMinutes <= startMinutes ||
+    endMinutes > 22 * 60
+  ) {
+    return { ok: false, error: GENERATION_ERRORS.invalidHours };
+  }
+
+  const hasBreakStart = breakStart.length > 0;
+  const hasBreakEnd = breakEnd.length > 0;
+
+  if (hasBreakStart !== hasBreakEnd) {
+    return { ok: false, error: GENERATION_ERRORS.invalidBreak };
+  }
+
+  if (hasBreakStart) {
+    const breakStartMinutes = parseTimeToMinutes(breakStart);
+    const breakEndMinutes = parseTimeToMinutes(breakEnd);
+
+    if (
+      breakStartMinutes === null ||
+      breakEndMinutes === null ||
+      breakEndMinutes <= breakStartMinutes
+    ) {
+      return { ok: false, error: GENERATION_ERRORS.invalidBreak };
+    }
+  }
+
+  const auth = await getAuthenticatedClient();
+
+  if (!auth) {
+    return { ok: false, error: GENERATION_ERRORS.sessionExpired };
+  }
+
+  const { data, error } = await auth.supabase.rpc("generate_timetable", {
+    p_class: classId,
+    p_semester: semester,
+    p_day_start: dayStart,
+    p_day_end: dayEnd,
+    p_break_start: hasBreakStart ? breakStart : null,
+    p_break_end: hasBreakEnd ? breakEnd : null,
+    p_days: days,
+  });
+
+  if (error) {
+    logSupabaseError("generateTimetable", error);
+    return { ok: false, error: mapGenerationError(error) };
+  }
+
+  revalidateTimetable();
+
+  return { ok: true, result: parseGenerationResult(data) };
+}
+
+export type UndoGenerationActionResult =
+  | { ok: true; count: number }
+  | { ok: false; error: string };
+
+export async function undoTimetableGeneration(
+  generationId: string,
+): Promise<UndoGenerationActionResult> {
+  const id = String(generationId ?? "").trim();
+
+  if (!isUuid(id)) {
+    return { ok: false, error: GENERATION_ERRORS.forbidden };
+  }
+
+  const auth = await getAuthenticatedClient();
+
+  if (!auth) {
+    return { ok: false, error: GENERATION_ERRORS.sessionExpired };
+  }
+
+  const { data, error } = await auth.supabase.rpc("undo_generation", {
+    p_generation: id,
+  });
+
+  if (error) {
+    logSupabaseError("undoTimetableGeneration", error);
+
+    if (isForbiddenError(error)) {
+      return { ok: false, error: GENERATION_ERRORS.forbidden };
+    }
+
+    if (isNotFoundError(error)) {
+      return { ok: false, error: GENERATION_ERRORS.generic };
+    }
+
+    return { ok: false, error: GENERATION_ERRORS.generic };
+  }
+
+  revalidateTimetable();
+
+  return {
+    ok: true,
+    count: typeof data === "number" ? data : 0,
+  };
 }

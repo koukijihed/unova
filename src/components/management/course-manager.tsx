@@ -23,6 +23,8 @@ import {
   setCourseActive,
   updateCourse,
 } from "@/lib/management/course-actions";
+import { RequirementManager } from "@/components/timetable/requirement-manager";
+import type { CourseRequirement, Room } from "@/lib/timetable/types";
 
 const SEMESTERS = Array.from({ length: 10 }, (_, index) => index + 1);
 
@@ -189,7 +191,15 @@ function CourseTeacherForm({ course }: { course: ManagementCourse }) {
   );
 }
 
-function CourseItem({ course }: { course: ManagementCourse }) {
+function CourseItem({
+  course,
+  requirements,
+  rooms,
+}: {
+  course: ManagementCourse;
+  requirements: CourseRequirement[];
+  rooms: Room[];
+}) {
   const [editing, setEditing] = useState(false);
   const labels = fr.app.management.courses;
   const teacherLabels = labels.teachers;
@@ -337,6 +347,14 @@ function CourseItem({ course }: { course: ManagementCourse }) {
 
         <CourseTeacherForm course={course} />
       </div>
+
+      <RequirementManager
+        course={course}
+        requirements={requirements.filter(
+          (requirement) => requirement.courseId === course.id,
+        )}
+        rooms={rooms}
+      />
     </li>
   );
 }
@@ -344,9 +362,13 @@ function CourseItem({ course }: { course: ManagementCourse }) {
 export function CourseManager({
   classId,
   courses,
+  requirements,
+  rooms,
 }: {
   classId: string;
   courses: ManagementCourse[];
+  requirements: CourseRequirement[];
+  rooms: Room[];
 }) {
   const labels = fr.app.management.courses;
 
@@ -377,7 +399,12 @@ export function CourseManager({
         ) : (
           <ul className="mt-4 space-y-4">
             {courses.map((course) => (
-              <CourseItem key={course.id} course={course} />
+              <CourseItem
+                key={course.id}
+                course={course}
+                requirements={requirements}
+                rooms={rooms}
+              />
             ))}
           </ul>
         )}

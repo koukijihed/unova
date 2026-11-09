@@ -1,12 +1,19 @@
 import { isUuid } from "@/lib/management/admin-validation";
 import { getClassCourses } from "@/lib/management/course-data";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import type {
-  Room,
-  SessionType,
-  TimetableCourse,
-  TimetableSession,
-  TimetableStatus,
+import {
+  isSessionType,
+  type CourseRequirement,
+  type Room,
+  type SessionType,
+  type TeacherUnavailability,
+  type TimetableCourse,
+  type TimetableGeneration,
+  type TimetableGenerationParams,
+  type TimetableGenerationResult,
+  type TimetableGenerationUnplaced,
+  type TimetableSession,
+  type TimetableStatus,
 } from "./types";
 
 type Relation<T> = T | T[] | null;
@@ -38,8 +45,40 @@ type SessionRow = {
   room_id: string | null;
   teacher_id: string | null;
   status: TimetableStatus;
+  is_locked: boolean;
+  generation_id: string | null;
   courses: Relation<{ name: string | null }>;
   rooms: Relation<{ name: string | null }>;
+};
+
+type RequirementRow = {
+  id: string;
+  course_id: string;
+  session_type: SessionType;
+  group_label: string | null;
+  sessions_per_week: number;
+  duration_minutes: number;
+  teacher_id: string | null;
+  preferred_room_id: string | null;
+  courses: Relation<{ name: string | null; class_id: string }>;
+};
+
+type UnavailabilityRow = {
+  id: string;
+  teacher_id: string;
+  weekday: number;
+  start_time: string;
+  end_time: string;
+  note: string | null;
+};
+
+type GenerationRow = {
+  id: string;
+  class_id: string;
+  semester: number;
+  params: unknown;
+  result: unknown;
+  created_at: string;
 };
 
 type TeacherNameRow = {
@@ -50,7 +89,7 @@ type TeacherNameRow = {
 
 const SESSION_COLUMNS = `id, class_id, course_id, semester, session_type,
   group_label, weekday, start_time, end_time, room_id, teacher_id, status,
-  courses(name), rooms(name)`;
+  is_locked, generation_id, courses(name), rooms(name)`;
 
 function firstRelation<T>(value: Relation<T>): T | null {
   if (Array.isArray(value)) {
@@ -134,6 +173,8 @@ function parseSession(
       ? (teacherNames.get(row.course_id)?.get(row.teacher_id) ?? "")
       : "",
     status: row.status,
+    isLocked: row.is_locked === true,
+    generationId: row.generation_id ?? null,
   };
 }
 
@@ -333,5 +374,225 @@ export async function getTimetableCounts(
     drafts: drafts.count ?? 0,
     published: published.count ?? 0,
     error: Boolean(drafts.error || published.error),
+  };
+}
+
+export type ClassRequirementsResult = {
+  requirements: CourseRequirement[];
+  error: boolean;
+};
+
+export async function getClassRequirements(
+  classId: string,
+): Promise<ClassRequirementsResult> {
+  if (!isUuid(classId)) {
+    return { requirements: [], error: false };
+  }
+
+  const supabase = await createServerSupabaseClient();
+  const { data, error } = await supabase
+    .from("course_requirements")
+    .select(
+      `id, course_id, session_type, group_label, sessions_per_week,
+       duration_minutes, teacher_id, preferred_room_id,
+       courses!inner(name, class_id)`,
+    )
+    .eq("courses.class_id", classId);
+
+  if (error) {
+    logSupabaseError("getClassRequirements", error);
+    return { requirements: [], error: true };
+  }
+
+  const rows = (data ?? []) as unknown as RequirementRow[];
+  const [teacherNames, roomsResult] = await Promise.all([
+    getTeacherNamesByCourse(rows.map((row) => row.course_id)),
+    getRooms(),
+  ]);
+  const roomNames = new Map(
+    roomsResult.rooms.map((room) => [room.id, room.name]),
+  );
+
+  const requirements = rows
+    .map((row) => ({
+      id: row.id,
+      courseId: row.course_id,
+      courseName: firstRelation(row.courses)?.name?.trim() ?? "",
+      sessionType: row.session_type,
+      groupLabel: row.group_label,
+      sessionsPerWeek: Number(row.sessions_per_week),
+      durationMinutes: Number(row.duration_minutes),
+      teacherId: row.teacher_id,
+      teacherName: row.teacher_id
+        ? (teacherNames.get(row.course_id)?.get(row.teacher_id) ?? "")
+        : "",
+      preferredRoomId: row.preferred_room_id,
+      preferredRoomName: row.preferred_room_id
+        ? (roomNames.get(row.preferred_room_id) ?? "")
+        : "",
+    }))
+    .sort(
+      (a, b) =>
+        a.courseName.localeCompare(b.courseName, "fr", {
+          sensitivity: "base",
+        }) ||
+        a.sessionType.localeCompare(b.sessionType, "fr") ||
+        (a.groupLabel ?? "").localeCompare(b.groupLabel ?? "", "fr", {
+          sensitivity: "base",
+        }),
+    );
+
+  return { requirements, error: false };
+}
+
+export type UnavailabilityResult = {
+  blocks: TeacherUnavailability[];
+  error: boolean;
+};
+
+export async function getTeacherUnavailability(
+  teacherId: string,
+): Promise<UnavailabilityResult> {
+  if (!isUuid(teacherId)) {
+    return { blocks: [], error: false };
+  }
+
+  const supabase = await createServerSupabaseClient();
+  const { data, error } = await supabase
+    .from("teacher_unavailability")
+    .select("id, teacher_id, weekday, start_time, end_time, note")
+    .eq("teacher_id", teacherId)
+    .order("weekday", { ascending: true })
+    .order("start_time", { ascending: true });
+
+  if (error) {
+    logSupabaseError("getTeacherUnavailability", error);
+    return { blocks: [], error: true };
+  }
+
+  return {
+    blocks: ((data ?? []) as UnavailabilityRow[]).map((row) => ({
+      id: row.id,
+      teacherId: row.teacher_id,
+      weekday: Number(row.weekday),
+      startTime: normalizeTime(row.start_time),
+      endTime: normalizeTime(row.end_time),
+      note: row.note,
+    })),
+    error: false,
+  };
+}
+
+function parseGenerationParams(value: unknown): TimetableGenerationParams {
+  const record =
+    value && typeof value === "object"
+      ? (value as Record<string, unknown>)
+      : {};
+  const rawDays = Array.isArray(record.days) ? record.days : [];
+  const days = rawDays
+    .map((day) => Number(day))
+    .filter((day) => Number.isInteger(day) && day >= 1 && day <= 6);
+
+  function readTime(key: string): string | null {
+    const raw = record[key];
+    return typeof raw === "string" ? normalizeTime(raw) : null;
+  }
+
+  return {
+    dayStart: readTime("day_start"),
+    dayEnd: readTime("day_end"),
+    breakStart: readTime("break_start"),
+    breakEnd: readTime("break_end"),
+    days,
+  };
+}
+
+function parseGenerationUnplaced(
+  value: unknown,
+): TimetableGenerationUnplaced[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.flatMap((item) => {
+    if (!item || typeof item !== "object") {
+      return [];
+    }
+
+    const row = item as Record<string, unknown>;
+    const sessionType =
+      typeof row.session_type === "string" && isSessionType(row.session_type)
+        ? row.session_type
+        : null;
+
+    if (!sessionType) {
+      return [];
+    }
+
+    return [
+      {
+        courseId: typeof row.course_id === "string" ? row.course_id : "",
+        courseName:
+          typeof row.course_name === "string" ? row.course_name : "",
+        sessionType,
+        group: typeof row.group === "string" ? row.group : null,
+        missing: Number(row.missing ?? 0),
+      },
+    ];
+  });
+}
+
+function parseGenerationResult(value: unknown): TimetableGenerationResult {
+  const record =
+    value && typeof value === "object"
+      ? (value as Record<string, unknown>)
+      : {};
+
+  return {
+    placed: Number(record.placed ?? 0),
+    removedDrafts: Number(record.removed_drafts ?? 0),
+    kept: Number(record.kept ?? 0),
+    placedWithoutRoom: Number(record.placed_without_room ?? 0),
+    unplaced: parseGenerationUnplaced(record.unplaced),
+  };
+}
+
+export type TimetableGenerationsResult = {
+  generations: TimetableGeneration[];
+  error: boolean;
+};
+
+export async function getTimetableGenerations(
+  classId: string,
+  semester: number,
+): Promise<TimetableGenerationsResult> {
+  if (!isUuid(classId)) {
+    return { generations: [], error: false };
+  }
+
+  const supabase = await createServerSupabaseClient();
+  const { data, error } = await supabase
+    .from("timetable_generations")
+    .select("id, class_id, semester, params, result, created_at")
+    .eq("class_id", classId)
+    .eq("semester", semester)
+    .order("created_at", { ascending: false })
+    .limit(30);
+
+  if (error) {
+    logSupabaseError("getTimetableGenerations", error);
+    return { generations: [], error: true };
+  }
+
+  return {
+    generations: ((data ?? []) as GenerationRow[]).map((row) => ({
+      id: row.id,
+      classId: row.class_id,
+      semester: Number(row.semester),
+      params: parseGenerationParams(row.params),
+      result: parseGenerationResult(row.result),
+      createdAt: row.created_at,
+    })),
+    error: false,
   };
 }

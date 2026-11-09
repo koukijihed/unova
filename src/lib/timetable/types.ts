@@ -44,6 +44,64 @@ export type TimetableSession = {
   teacherId: string | null;
   teacherName: string;
   status: TimetableStatus;
+  isLocked: boolean;
+  generationId: string | null;
+};
+
+export type CourseRequirement = {
+  id: string;
+  courseId: string;
+  courseName: string;
+  sessionType: SessionType;
+  groupLabel: string | null;
+  sessionsPerWeek: number;
+  durationMinutes: number;
+  teacherId: string | null;
+  teacherName: string;
+  preferredRoomId: string | null;
+  preferredRoomName: string;
+};
+
+export type TeacherUnavailability = {
+  id: string;
+  teacherId: string;
+  weekday: number;
+  startTime: string;
+  endTime: string;
+  note: string | null;
+};
+
+export type TimetableGenerationParams = {
+  dayStart: string | null;
+  dayEnd: string | null;
+  breakStart: string | null;
+  breakEnd: string | null;
+  days: number[];
+};
+
+export type TimetableGenerationUnplaced = {
+  courseId: string;
+  courseName: string;
+  sessionType: SessionType;
+  group: string | null;
+  missing: number;
+};
+
+export type TimetableGenerationResult = {
+  placed: number;
+  removedDrafts: number;
+  kept: number;
+  placedWithoutRoom: number;
+  unplaced: TimetableGenerationUnplaced[];
+};
+
+export type TimetableGeneration = {
+  id: string;
+  classId: string;
+  semester: number;
+  params: TimetableGenerationParams;
+  result: TimetableGenerationResult;
+  createdAt: string;
 };
 
 export function isSessionType(value: string): value is SessionType {

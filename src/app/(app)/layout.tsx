@@ -37,6 +37,7 @@ export default async function AppLayout({
     <AppShell
       profile={profileNames}
       canManage={hasManagementRole(roles)}
+      canTeach={roles?.includes("teacher") ?? false}
       avatarUrl={avatarUrl}
     >
       {children}

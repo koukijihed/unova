@@ -109,17 +109,27 @@ export function AppShell({
   children,
   profile,
   canManage,
+  canTeach,
   avatarUrl,
 }: {
   children: React.ReactNode;
   profile: ProfileNames;
   canManage: boolean;
+  canTeach: boolean;
   avatarUrl: string | null;
 }) {
   const pathname = usePathname();
-  const navItems = fr.app.nav.items.filter(
-    (item) => item.href !== "/gestion" || canManage,
-  );
+  const navItems = fr.app.nav.items.filter((item) => {
+    if (item.href === "/gestion") {
+      return canManage;
+    }
+
+    if (item.href === "/disponibilites") {
+      return canTeach;
+    }
+
+    return true;
+  });
   const [menuOpen, setMenuOpen] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);

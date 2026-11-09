@@ -10,20 +10,25 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import { ConfirmAction } from "@/components/management/confirm-action";
-import { useFormFeedback } from "@/components/management/feedback";
+import { useFeedback, useFormFeedback } from "@/components/management/feedback";
 import { FormError } from "@/components/management/form-error";
 import { fr } from "@/content/fr";
 import { initialManagementActionState } from "@/lib/management/action-state";
 import {
   deleteTimetableEntryFormAction,
+  lockAllDraftSessionsFormAction,
+  setSessionLock,
   setTimetableStatusFormAction,
 } from "@/lib/timetable/actions";
 import { formatTimeRange, weekdayLabel } from "@/lib/timetable/format";
 import type {
+  CourseRequirement,
   Room,
   TimetableCourse,
+  TimetableGeneration,
   TimetableSession,
 } from "@/lib/timetable/types";
+import { GenerationPanel } from "./generation-panel";
 import { SessionFormDialog } from "./session-form";
 import { TimetableGrid } from "./timetable-grid";
 
@@ -157,6 +162,9 @@ export function TimetableBoard({
   sessions,
   courses,
   rooms,
+  requirements,
+  generations,
+  generationsError,
   drafts,
   published,
 }: {
@@ -165,14 +173,20 @@ export function TimetableBoard({
   sessions: TimetableSession[];
   courses: TimetableCourse[];
   rooms: Room[];
+  requirements: CourseRequirement[];
+  generations: TimetableGeneration[];
+  generationsError: boolean;
   drafts: number;
   published: number;
 }) {
   const labels = fr.app.timetable.management;
   const router = useRouter();
+  const { showMessage } = useFeedback();
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<TimetableSession | null>(null);
   const [deleting, setDeleting] = useState<TimetableSession | null>(null);
+  const [lockPendingId, setLockPendingId] = useState<string | null>(null);
+  const [lockError, setLockError] = useState<string | null>(null);
 
   function openCreate() {
     setEditing(null);
@@ -198,8 +212,40 @@ export function TimetableBoard({
     router.refresh();
   }
 
+  async function handleToggleLock(session: TimetableSession) {
+    setLockPendingId(session.id);
+    setLockError(null);
+
+    try {
+      const response = await setSessionLock(session.id, !session.isLocked);
+
+      if (response.ok) {
+        showMessage(
+          session.isLocked ? labels.unlockedMessage : labels.lockedMessage,
+        );
+        router.refresh();
+      } else {
+        setLockError(response.error);
+      }
+    } catch {
+      setLockError(fr.app.timetable.management.errors.generic);
+    } finally {
+      setLockPendingId(null);
+    }
+  }
+
   return (
-    <div className="mt-8">
+    <div className="mt-8 space-y-6">
+      <GenerationPanel
+        classId={classId}
+        semester={semester}
+        published={published}
+        requirements={requirements}
+        sessions={sessions}
+        generations={generations}
+        generationsError={generationsError}
+      />
+
       <div className="rounded-2xl border border-primary/10 bg-white p-5 shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -271,7 +317,29 @@ export function TimetableBoard({
             confirmLabel={labels.unpublishConfirm}
             pendingLabel={labels.processing}
           />
+
+          <ConfirmAction
+            action={lockAllDraftSessionsFormAction}
+            fields={{
+              classId,
+              semester: String(semester),
+            }}
+            triggerLabel={labels.lockAll}
+            title={labels.lockAllTitle}
+            description={labels.lockAllDescription}
+            confirmLabel={labels.lockAllConfirm}
+            pendingLabel={labels.processing}
+          />
         </div>
+
+        {lockError ? (
+          <p
+            role="alert"
+            className="mt-4 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm leading-6 text-red-900"
+          >
+            {lockError}
+          </p>
+        ) : null}
       </div>
 
       {sessions.length === 0 ? (
@@ -283,6 +351,9 @@ export function TimetableBoard({
           <TimetableGrid
             sessions={sessions}
             onSelect={openEdit}
+            onToggleLock={handleToggleLock}
+            lockPendingId={lockPendingId}
+            showManagementBadges
             caption={fr.app.timetable.view.gridCaption}
           />
         </div>

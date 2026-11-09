@@ -25,11 +25,54 @@ const DRAFT_BADGE_CLASSES =
   "shrink-0 rounded bg-amber-200 px-1 py-px text-[9px] font-semibold leading-3 text-amber-950";
 const PUBLISHED_BADGE_CLASSES =
   "shrink-0 rounded bg-emerald-200 px-1 py-px text-[9px] font-semibold leading-3 text-emerald-950";
+const LOCKED_BADGE_CLASSES =
+  "inline-flex shrink-0 items-center gap-0.5 rounded bg-slate-200 px-1 py-px text-[9px] font-semibold leading-3 text-slate-900";
+const GENERATED_BADGE_CLASSES =
+  "shrink-0 rounded bg-sky-200 px-1 py-px text-[9px] font-semibold leading-3 text-sky-950";
 
 const WEEKDAYS = [1, 2, 3, 4, 5, 6] as const;
 const GRID_HEIGHT_CLASSES = "h-[660px] print:h-[145mm]";
 
-function sessionLabel(session: TimetableSession): string {
+function LockIcon({ locked }: { locked: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+      className="size-3"
+    >
+      <rect
+        x="5"
+        y="10"
+        width="14"
+        height="10"
+        rx="2"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+      {locked ? (
+        <path
+          d="M8 10V7a4 4 0 0 1 8 0v3"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+      ) : (
+        <path
+          d="M8 10V7a4 4 0 0 1 7.5-1.8"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+      )}
+    </svg>
+  );
+}
+
+function sessionLabel(
+  session: TimetableSession,
+  showManagementBadges: boolean,
+): string {
   const details = [
     session.courseName,
     sessionTypeLabel(session.sessionType),
@@ -45,6 +88,12 @@ function sessionLabel(session: TimetableSession): string {
       ? `${fr.app.timetable.common.teacher} ${session.teacherName}`
       : null,
     timetableStatusLabel(session.status),
+    showManagementBadges && session.isLocked
+      ? fr.app.timetable.common.locked
+      : null,
+    showManagementBadges && session.generationId
+      ? fr.app.timetable.common.generated
+      : null,
   ].filter(Boolean);
 
   return details.join(", ");
@@ -53,9 +102,11 @@ function sessionLabel(session: TimetableSession): string {
 function SessionContent({
   session,
   compact = false,
+  showManagementBadges = false,
 }: {
   session: TimetableSession;
   compact?: boolean;
+  showManagementBadges?: boolean;
 }) {
   return (
     <>
@@ -77,6 +128,22 @@ function SessionContent({
           {timetableStatusLabel(session.status)}
         </span>
       </span>
+
+      {showManagementBadges && (session.isLocked || session.generationId) ? (
+        <span className="flex flex-wrap gap-1">
+          {session.isLocked ? (
+            <span className={LOCKED_BADGE_CLASSES}>
+              <LockIcon locked />
+              {fr.app.timetable.common.locked}
+            </span>
+          ) : null}
+          {session.generationId ? (
+            <span className={GENERATED_BADGE_CLASSES}>
+              {fr.app.timetable.common.generated}
+            </span>
+          ) : null}
+        </span>
+      ) : null}
 
       <span
         className={`truncate font-semibold ${
@@ -118,14 +185,11 @@ function SessionContent({
   );
 }
 
-function sessionClasses(session: TimetableSession, interactive: boolean): string {
+function sessionClasses(session: TimetableSession): string {
   return [
-    "timetable-session flex h-full w-full flex-col gap-0.5 overflow-hidden rounded-md border border-l-4 px-1.5 py-1 text-left",
+    "timetable-session relative flex h-full w-full flex-col overflow-hidden rounded-md border border-l-4 text-left",
     TYPE_CLASSES[session.sessionType],
     session.status === "draft" ? "border-dashed" : "",
-    interactive
-      ? "cursor-pointer transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-      : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -134,35 +198,67 @@ function sessionClasses(session: TimetableSession, interactive: boolean): string
 function SessionBlock({
   session,
   onSelect,
+  onToggleLock,
+  lockPending = false,
+  showManagementBadges = false,
   className = "",
   style,
 }: {
   session: TimetableSession;
   onSelect?: (session: TimetableSession) => void;
+  onToggleLock?: (session: TimetableSession) => void;
+  lockPending?: boolean;
+  showManagementBadges?: boolean;
   className?: string;
   style?: CSSProperties;
 }) {
-  const label = sessionLabel(session);
-  const classes = `${sessionClasses(session, Boolean(onSelect))} ${className}`;
-
-  if (onSelect) {
-    return (
-      <button
-        type="button"
-        onClick={() => onSelect(session)}
-        aria-label={label}
-        title={label}
-        className={classes}
-        style={style}
-      >
-        <SessionContent session={session} compact />
-      </button>
-    );
-  }
+  const label = sessionLabel(session, showManagementBadges);
+  const classes = `${sessionClasses(session)} ${className}`;
+  const lockLabel = session.isLocked
+    ? fr.app.timetable.common.unlock
+    : fr.app.timetable.common.lock;
+  const contentClasses = `flex min-h-0 flex-1 flex-col gap-0.5 px-1.5 py-1 text-left ${
+    onToggleLock ? "pr-6" : ""
+  }`;
 
   return (
     <div title={label} className={classes} style={style}>
-      <SessionContent session={session} compact />
+      {onSelect ? (
+        <button
+          type="button"
+          onClick={() => onSelect(session)}
+          aria-label={label}
+          className={`${contentClasses} transition-colors hover:bg-white/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent`}
+        >
+          <SessionContent
+            session={session}
+            compact
+            showManagementBadges={showManagementBadges}
+          />
+        </button>
+      ) : (
+        <div className={contentClasses}>
+          <SessionContent
+            session={session}
+            compact
+            showManagementBadges={showManagementBadges}
+          />
+        </div>
+      )}
+
+      {onToggleLock ? (
+        <button
+          type="button"
+          onClick={() => onToggleLock(session)}
+          disabled={lockPending}
+          aria-pressed={session.isLocked}
+          aria-label={`${lockLabel} — ${label}`}
+          title={lockLabel}
+          className="absolute right-1 bottom-1 inline-flex size-5 items-center justify-center rounded border border-current/30 bg-white/80 transition-colors hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-wait disabled:opacity-60"
+        >
+          <LockIcon locked={session.isLocked} />
+        </button>
+      ) : null}
     </div>
   );
 }
@@ -170,29 +266,60 @@ function SessionBlock({
 function MobileSession({
   session,
   onSelect,
+  onToggleLock,
+  lockPending = false,
+  showManagementBadges = false,
 }: {
   session: TimetableSession;
   onSelect?: (session: TimetableSession) => void;
+  onToggleLock?: (session: TimetableSession) => void;
+  lockPending?: boolean;
+  showManagementBadges?: boolean;
 }) {
-  const label = sessionLabel(session);
-  const classes = `${sessionClasses(session, Boolean(onSelect))} min-h-20`;
-
-  if (onSelect) {
-    return (
-      <button
-        type="button"
-        onClick={() => onSelect(session)}
-        aria-label={label}
-        className={classes}
-      >
-        <SessionContent session={session} />
-      </button>
-    );
-  }
+  const label = sessionLabel(session, showManagementBadges);
+  const classes = `${sessionClasses(session)} min-h-20`;
+  const lockLabel = session.isLocked
+    ? fr.app.timetable.common.unlock
+    : fr.app.timetable.common.lock;
+  const contentClasses =
+    "flex min-h-0 flex-1 flex-col gap-0.5 px-1.5 py-1 text-left";
 
   return (
     <div className={classes}>
-      <SessionContent session={session} />
+      {onSelect ? (
+        <button
+          type="button"
+          onClick={() => onSelect(session)}
+          aria-label={label}
+          className={`${contentClasses} transition-colors hover:bg-white/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent`}
+        >
+          <SessionContent
+            session={session}
+            showManagementBadges={showManagementBadges}
+          />
+        </button>
+      ) : (
+        <div className={contentClasses}>
+          <SessionContent
+            session={session}
+            showManagementBadges={showManagementBadges}
+          />
+        </div>
+      )}
+
+      {onToggleLock ? (
+        <button
+          type="button"
+          onClick={() => onToggleLock(session)}
+          disabled={lockPending}
+          aria-pressed={session.isLocked}
+          aria-label={`${lockLabel} — ${label}`}
+          className="mx-1.5 mb-1.5 inline-flex min-h-8 items-center gap-1 self-start rounded border border-current/30 bg-white/80 px-2 text-[11px] font-semibold transition-colors hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-wait disabled:opacity-60"
+        >
+          <LockIcon locked={session.isLocked} />
+          {lockLabel}
+        </button>
+      ) : null}
     </div>
   );
 }
@@ -209,10 +336,16 @@ function sortByStartTime(sessions: TimetableSession[]): TimetableSession[] {
 export function TimetableGrid({
   sessions,
   onSelect,
+  onToggleLock,
+  lockPendingId = null,
+  showManagementBadges = false,
   caption,
 }: {
   sessions: TimetableSession[];
   onSelect?: (session: TimetableSession) => void;
+  onToggleLock?: (session: TimetableSession) => void;
+  lockPendingId?: string | null;
+  showManagementBadges?: boolean;
   caption?: string;
 }) {
   const labels = fr.app.timetable.view;
@@ -336,6 +469,9 @@ export function TimetableGrid({
                         <SessionBlock
                           session={session}
                           onSelect={onSelect}
+                          onToggleLock={onToggleLock}
+                          lockPending={lockPendingId === session.id}
+                          showManagementBadges={showManagementBadges}
                           className="h-full"
                         />
                       </div>
@@ -376,7 +512,13 @@ export function TimetableGrid({
               <ul className="mt-2 space-y-2">
                 {daySessions.map((session) => (
                   <li key={session.id}>
-                    <MobileSession session={session} onSelect={onSelect} />
+                    <MobileSession
+                      session={session}
+                      onSelect={onSelect}
+                      onToggleLock={onToggleLock}
+                      lockPending={lockPendingId === session.id}
+                      showManagementBadges={showManagementBadges}
+                    />
                   </li>
                 ))}
               </ul>
