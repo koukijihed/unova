@@ -95,6 +95,11 @@ export default async function DashboardPage() {
       ...quickAccessLabels.videos,
     },
     {
+      key: "timetable",
+      href: "/emplois-du-temps",
+      ...quickAccessLabels.timetable,
+    },
+    {
       key: "questions",
       href: "/questions-reponses",
       ...quickAccessLabels.questions,

@@ -60,10 +60,26 @@ export default async function ManagementPage() {
           },
         ]
       : []),
-    {
-      title: cards.schedules.title,
-      description: cards.schedules.description,
-    },
+    ...(canManage
+      ? [
+          {
+            title: cards.schedules.title,
+            description: cards.schedules.description,
+            href: "/gestion/emplois-du-temps",
+            action: cards.schedules.action,
+          },
+        ]
+      : []),
+    ...(isAdmin
+      ? [
+          {
+            title: cards.rooms.title,
+            description: cards.rooms.description,
+            href: "/gestion/salles",
+            action: cards.rooms.action,
+          },
+        ]
+      : []),
     {
       title: cards.statistics.title,
       description: cards.statistics.description,

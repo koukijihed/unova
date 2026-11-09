@@ -1,6 +1,6 @@
 # Statut du projet UNOVA
 
-Dernière mise à jour : 8 novembre 2026
+Dernière mise à jour : 9 novembre 2026
 
 ## Implémenté
 
@@ -36,6 +36,10 @@ Dernière mise à jour : 8 novembre 2026
 - Liens Google Drive par cours : ajout, modification, masquage/affichage et suppression avec confirmation par les utilisateurs autorisés par `can_upload_to_course`, affichage dans la section Documents du cours et visionneuse intégrée `/liens/[id]`. Seuls le type de ressource et l'identifiant Drive sont stockés ; toutes les URL sont reconstruites côté site sur `drive.google.com` et `docs.google.com`. Auto-test des liens dans `scripts/test-drive-links.mjs` (`npm run test:drive-links`).
 - Vidéos YouTube et playlists par cours : ajout, modification, position, masquage/affichage et suppression avec confirmation par les utilisateurs autorisés par `can_upload_to_course`. Seuls le type (`video` ou `playlist`) et l'identifiant YouTube sont stockés ; toutes les URL sont reconstruites sur `youtube-nocookie.com` (intégration) et `youtube.com` (lecture). Liste `/videos` avec filtres `?cours=`, `?q=` insensible aux accents et pagination de 20, visionneuse `/videos/[id]` avec lecteur 16:9, message de repli et bouton « Ouvrir sur YouTube ». Auto-test de l'analyse des liens dans `scripts/test-youtube-links.mjs` (`npm run test:youtube-links`).
 - Questions-Réponses par cours : messages de type question ou commentaire, réponses sur un seul niveau, avatars signés avec repli sur les initiales, badges Enseignant/Directeur/Administrateur, contexte facultatif (document, vidéo ou lien Drive), états « Résolue » et « Masqué », modification et suppression par l'auteur, résolution par l'auteur ou l'équipe pédagogique, masquage/affichage et suppression par l'équipe, limite de 10 messages par minute, pagination de 20 (`?qpage=`). Composant réutilisé sur `/cours/[id]`, `/videos/[id]`, `/documents/[id]` et `/liens/[id]`. Page `/questions-reponses` avec filtres `?cours=`, `?etat=ouvertes|resolues`, `?q=` insensible aux accents et pagination de 20.
+- Salles `/gestion/salles` (administrateur uniquement) : liste, création (nom de 1 à 60 caractères, capacité facultative de 1 à 1000), modification et activation/désactivation sans suppression, avec l'erreur « Une salle porte déjà ce nom. ».
+- Emplois du temps manuels `/gestion/emplois-du-temps` (administrateurs et directeurs) : sélection de la classe et du semestre (1 ou 2), grille hebdomadaire du lundi au samedi de 08:00 à 19:00, séances positionnées avec cours, type (Cours/TD/TP), groupe, horaire, salle, enseignant et badge « Brouillon » ou « Publié », formulaire d'ajout et de modification (cours de la classe, enseignants du cours, salles actives), suppression avec confirmation native, détection des conflits (classe ou groupe, enseignant, salle) avec messages en français, et publication/dépublication du semestre via `set_timetable_status` avec confirmation et compteurs.
+- Consultation des emplois du temps `/emplois-du-temps` : étudiants (séances publiées de leur classe acceptée), enseignants (séances publiées dont ils sont responsables ou enseignants du cours), administrateurs et directeurs (choix de la classe, filtres groupe/enseignant/salle, brouillons visibles), grille sur ordinateur, liste par jour sur mobile, noms de jours et horaires en français, et bouton « Imprimer » avec feuille de style paysage.
+- Logique de disposition de la grille dans `src/lib/timetable/layout.ts` (positionnement vertical et colonnes pour les chevauchements), couverte par l'auto-test `npm run test:timetable-layout`.
 - Tableau de bord avec le message « Bonjour, <prénom> » et notices d'inscription : aucun profil étudiant (lien vers `/verification`), en attente, acceptée, refusée, interrompue ou terminée.
 - Écran d'acceptation des inscriptions pour les administrateurs et directeurs de programme : `/gestion` et `/gestion/etudiants`, sélection de classe, recherche par nom, compteurs, actions Accepter / Refuser / Remettre en attente (y compris pour les inscriptions acceptées), refus d'une inscription acceptée avec confirmation, et « Tout accepter » avec confirmation.
 - Accès à `/gestion` réservé aux rôles `admin` et `director`, avec entrée « Gestion » affichée uniquement pour ces rôles.
@@ -67,7 +71,11 @@ Dernière mise à jour : 8 novembre 2026
 - Aperçu des fichiers Word, PowerPoint et Excel dans le navigateur.
 - Notifications des réponses aux questions.
 - Questions anonymes.
-- Emplois du temps.
+- Disponibilités des enseignants.
+- Génération automatique des emplois du temps avec séances verrouillées.
+- Gestion des jours fériés.
+- Notifications lors des changements d'emploi du temps.
+- Export calendrier des emplois du temps.
 - Nettoyage des fichiers orphelins dans le bucket `documents`.
 - Suivi de l'espace de stockage utilisé.
 - Statistiques de gestion.
@@ -80,7 +88,7 @@ Dernière mise à jour : 8 novembre 2026
 
 ## Limites actuelles
 
-- L'acceptation des inscriptions, la gestion des enseignants, des cours et de la structure académique sont disponibles ; les emplois du temps restent à venir.
+- L'acceptation des inscriptions, la gestion des enseignants, des cours, de la structure académique, des salles et des emplois du temps manuels sont disponibles ; la génération automatique reste à venir.
 - L'import de la liste officielle se fait uniquement en ligne de commande ; aucune page d'administration n'est encore proposée.
 - L'espace applicatif est protégé, mais plusieurs de ses pages métier restent des pages d'attente.
 - Aucune donnée académique, aucun utilisateur fictif et aucune statistique ne sont affichés.
@@ -98,3 +106,6 @@ Dernière mise à jour : 8 novembre 2026
 - Un fichier Google Drive supprimé rend le lien correspondant mort.
 - Les vidéos YouTube dont l'auteur interdit l'intégration ne peuvent pas être lues dans le lecteur du site ; le bouton « Ouvrir sur YouTube » reste disponible.
 - Aucune notification automatique n'est encore envoyée lors d'une réponse à une question.
+- Le semestre d'un emploi du temps est le semestre de l'année universitaire (1 ou 2).
+- La publication des emplois du temps s'effectue par classe et par semestre.
+- Aucune exception n'est encore gérée pour les jours fériés ou les séances ponctuelles.

@@ -21,3 +21,30 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
+
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 10mm;
+  }
+
+  aside,
+  header,
+  dialog,
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  main {
+    padding: 0 !important;
+  }
+
+  .timetable-session {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

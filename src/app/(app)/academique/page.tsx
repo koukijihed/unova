@@ -20,7 +20,11 @@ export default function AcademicPage() {
     { key: "courses", ...labels.modules.courses },
     { key: "documents", ...labels.modules.documents, href: "/documents" },
     { key: "videos", ...labels.modules.videos, href: "/videos" },
-    { key: "schedules", ...labels.modules.schedules },
+    {
+      key: "schedules",
+      ...labels.modules.schedules,
+      href: "/emplois-du-temps",
+    },
     {
       key: "questions",
       ...labels.modules.questions,

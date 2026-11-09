@@ -374,6 +374,11 @@ export const fr = {
           description:
             "Regardez les vidéos et playlists YouTube de vos cours.",
         },
+        timetable: {
+          title: "Emplois du temps",
+          description:
+            "Consultez les séances hebdomadaires de votre classe ou de vos cours.",
+        },
         questions: {
           title: "Questions-Réponses",
           description:
@@ -417,12 +422,275 @@ export const fr = {
         schedules: {
           title: "Emplois du temps",
           description:
-            "Les emplois du temps officiels seront publiés ici.",
+            "Consultez les emplois du temps publiés de votre classe ou de vos cours.",
         },
         questions: {
           title: "Questions-Réponses",
           description:
             "Posez vos questions et échangez avec les enseignants et les étudiants.",
+        },
+      },
+    },
+    timetable: {
+      weekdays: {
+        monday: "Lundi",
+        tuesday: "Mardi",
+        wednesday: "Mercredi",
+        thursday: "Jeudi",
+        friday: "Vendredi",
+        saturday: "Samedi",
+      },
+      sessionTypes: {
+        cours: "Cours",
+        td: "TD",
+        tp: "TP",
+      },
+      status: {
+        draft: "Brouillon",
+        published: "Publié",
+      },
+      semesters: {
+        first: "Semestre 1",
+        second: "Semestre 2",
+      },
+      common: {
+        print: "Imprimer",
+        group: "Groupe",
+        room: "Salle",
+        teacher: "Enseignant",
+      },
+      view: {
+        metadataTitle: "Emplois du temps — UNOVA",
+        eyebrow: "Emplois du temps",
+        title: "Emplois du temps",
+        description:
+          "Consultez les séances hebdomadaires de votre classe ou de vos cours.",
+        studentTitle: "Mon emploi du temps",
+        teacherTitle: "Mes séances",
+        staffTitle: "Emploi du temps de la classe",
+        semesterLabel: "Semestre",
+        show: "Afficher",
+        classLabel: "Classe",
+        classPlaceholder: "Sélectionner une classe",
+        noClasses: "Aucune classe n'est disponible pour votre compte.",
+        noClassSelected:
+          "Sélectionnez une classe pour afficher son emploi du temps.",
+        invalidClass:
+          "Cette classe n'est pas accessible depuis votre compte.",
+        classesLoadFailed:
+          "Impossible de charger les classes pour le moment.",
+        loadFailed:
+          "Impossible de charger l'emploi du temps pour le moment.",
+        noSessions: "Aucune séance n'est enregistrée pour ce semestre.",
+        noSessionsForFilters:
+          "Aucune séance ne correspond aux filtres sélectionnés.",
+        noAcceptedEnrollment:
+          "Votre compte étudiant n'est pas rattaché à une inscription acceptée. Vérifiez votre identité ou contactez l'administration.",
+        pendingEnrollment:
+          "Votre inscription est en attente de validation. Votre emploi du temps sera disponible après l'acceptation de votre inscription.",
+        verificationLink: "Vérifier mon identité",
+        teacherEmpty:
+          "Aucune séance publiée ne vous est attribuée pour ce semestre.",
+        unknownRole:
+          "Votre compte ne permet pas encore d'afficher un emploi du temps.",
+        filtersTitle: "Filtres",
+        groupLabel: "Groupe",
+        groupAll: "Tous les groupes",
+        teacherLabel: "Enseignant",
+        teacherAll: "Tous les enseignants",
+        roomLabel: "Salle",
+        roomAll: "Toutes les salles",
+        applyFilters: "Appliquer",
+        resetFilters: "Réinitialiser",
+        draftNotice:
+          "Les séances marquées « Brouillon » ne sont pas encore visibles par les étudiants.",
+        gridCaption:
+          "Emploi du temps hebdomadaire, du lundi au samedi, de 08:00 à 19:00",
+        mobileTitle: "Séances par jour",
+        semesterCaption: "Semestre affiché : {semester}",
+        draftBadge: "Brouillon",
+        publishedBadge: "Publié",
+      },
+      management: {
+        metadataTitle: "Emplois du temps — Gestion — UNOVA",
+        eyebrow: "Gestion des emplois du temps",
+        title: "Emplois du temps",
+        description:
+          "Planifiez les séances hebdomadaires des classes, puis publiez le semestre.",
+        classLabel: "Classe",
+        classPlaceholder: "Sélectionner une classe",
+        semesterLabel: "Semestre",
+        show: "Afficher",
+        noClasses: "Aucune classe n'est disponible pour votre compte.",
+        noClassSelected:
+          "Sélectionnez une classe pour afficher son emploi du temps.",
+        invalidClass:
+          "Cette classe n'est pas accessible depuis votre compte.",
+        classesLoadFailed:
+          "Impossible de charger les classes pour le moment.",
+        sessionsLoadFailed:
+          "Impossible de charger les séances pour le moment.",
+        coursesLoadFailed:
+          "Impossible de charger les cours pour le moment.",
+        roomsLoadFailed:
+          "Impossible de charger les salles pour le moment.",
+        countsTitle: "État de publication",
+        draftCountOne: "1 brouillon",
+        draftCountMany: "{count} brouillons",
+        publishedCountOne: "1 séance publiée",
+        publishedCountMany: "{count} séances publiées",
+        addSession: "Ajouter une séance",
+        addTitle: "Nouvelle séance",
+        editTitle: "Modifier la séance",
+        formDescription:
+          "Renseignez le cours, le créneau, la salle et l'enseignant.",
+        empty: "Aucune séance n'est enregistrée pour ce semestre.",
+        publish: "Publier le semestre",
+        unpublish: "Dépublier le semestre",
+        publishTitle: "Publier le semestre",
+        unpublishTitle: "Dépublier le semestre",
+        publishDescriptionOne:
+          "1 séance en brouillon sera publiée et deviendra visible par les étudiants.",
+        publishDescriptionMany:
+          "{count} séances en brouillon seront publiées et deviendront visibles par les étudiants.",
+        unpublishDescriptionOne:
+          "1 séance publiée repassera en brouillon et ne sera plus visible par les étudiants.",
+        unpublishDescriptionMany:
+          "{count} séances publiées repasseront en brouillon et ne seront plus visibles par les étudiants.",
+        publishConfirm: "Publier",
+        unpublishConfirm: "Dépublier",
+        noChange: "Aucune séance ne sera modifiée.",
+        processing: "Traitement…",
+        statusUpdated:
+          "Le statut des séances a été mis à jour ({count} séance(s)).",
+        created: "La séance a été ajoutée.",
+        updated: "La séance a été mise à jour.",
+        deleted: "La séance a été supprimée.",
+        deleteTitle: "Supprimer la séance",
+        deleteDescription:
+          "La séance de « {course} » du {day} de {time} sera définitivement supprimée.",
+        deleteConfirm: "Supprimer",
+        deleting: "Suppression…",
+        form: {
+          courseLabel: "Cours",
+          coursePlaceholder: "Sélectionner un cours",
+          typeLabel: "Type de séance",
+          groupLabel: "Groupe (facultatif)",
+          groupPlaceholder: "Ex. : Groupe A",
+          groupHint: "20 caractères maximum.",
+          weekdayLabel: "Jour",
+          weekdayPlaceholder: "Sélectionner un jour",
+          startLabel: "Heure de début",
+          endLabel: "Heure de fin",
+          roomLabel: "Salle",
+          roomPlaceholder: "Aucune salle",
+          inactiveRoomSuffix: " (inactive)",
+          teacherLabel: "Enseignant (facultatif)",
+          teacherPlaceholder: "Aucun enseignant",
+          teacherHint:
+            "Seuls les enseignants affectés au cours choisi sont proposés.",
+          noTeachers: "Aucun enseignant n'est affecté à ce cours.",
+          noCourses: "Aucun cours n'est disponible pour cette classe.",
+          submitCreate: "Ajouter la séance",
+          submitUpdate: "Enregistrer",
+          submitting: "Enregistrement…",
+          cancel: "Annuler",
+          delete: "Supprimer la séance",
+          errors: {
+            courseRequired: "Sélectionnez un cours.",
+            typeRequired: "Sélectionnez un type de séance.",
+            weekdayRequired: "Sélectionnez un jour.",
+            timeRequired: "Renseignez l'heure de début et l'heure de fin.",
+            endAfterStart:
+              "L'heure de fin doit être postérieure à l'heure de début.",
+            timeRange:
+              "Les séances doivent se dérouler entre 08:00 et 19:00.",
+          },
+        },
+        errors: {
+          conflictClass:
+            "Cette classe (ou ce groupe) a déjà une séance sur ce créneau.",
+          conflictTeacher:
+            "Cet enseignant a déjà une séance sur ce créneau (dans cette classe ou une autre).",
+          conflictRoom: "Cette salle est déjà occupée sur ce créneau.",
+          invalidCourseOrTeacher:
+            "Le cours ou l'enseignant choisi n'est pas valide pour cette classe.",
+          forbidden: "Accès refusé.",
+          generic: "Une erreur est survenue. Réessayez.",
+          sessionExpired:
+            "Votre session a expiré. Reconnectez-vous pour continuer.",
+          courseRequired: "Sélectionnez un cours.",
+          typeInvalid: "Sélectionnez un type de séance valide.",
+          groupTooLong: "Le groupe ne doit pas dépasser 20 caractères.",
+          weekdayInvalid: "Sélectionnez un jour valide.",
+          timeInvalid: "Renseignez des heures valides.",
+          timeOrder:
+            "L'heure de fin doit être postérieure à l'heure de début.",
+          timeRange:
+            "Les séances doivent se dérouler entre 08:00 et 19:00.",
+          invalidRoom: "La salle sélectionnée est invalide.",
+          invalidTeacher: "L'enseignant sélectionné est invalide.",
+        },
+      },
+      rooms: {
+        metadataTitle: "Salles — Gestion — UNOVA",
+        eyebrow: "Gestion des salles",
+        title: "Salles",
+        description:
+          "Gérez les salles disponibles pour les séances. Une salle désactivée n'est plus proposée lors de la planification.",
+        createTitle: "Nouvelle salle",
+        createDescription:
+          "Ajoutez une salle avec un nom unique et une capacité facultative.",
+        nameLabel: "Nom de la salle",
+        namePlaceholder: "Ex. : Amphi A",
+        capacityLabel: "Capacité (facultatif)",
+        capacityPlaceholder: "Ex. : 60",
+        capacityHint: "Nombre entier entre 1 et 1000.",
+        createSubmit: "Ajouter la salle",
+        creating: "Ajout…",
+        listTitle: "Salles enregistrées",
+        empty: "Aucune salle n'est enregistrée.",
+        loadFailed: "Impossible de charger les salles pour le moment.",
+        table: {
+          caption: "Liste des salles",
+          name: "Salle",
+          capacity: "Capacité",
+          status: "Statut",
+          actions: "Actions",
+        },
+        active: "Active",
+        inactive: "Inactive",
+        noCapacity: "Non renseignée",
+        edit: "Modifier",
+        editTitle: "Modifier la salle",
+        save: "Enregistrer",
+        saving: "Enregistrement…",
+        cancel: "Annuler",
+        activate: "Activer",
+        deactivate: "Désactiver",
+        activateTitle: "Activer la salle",
+        deactivateTitle: "Désactiver la salle",
+        activateDescription:
+          "La salle « {name} » sera de nouveau proposée lors de la planification des séances.",
+        deactivateDescription:
+          "La salle « {name} » ne sera plus proposée lors de la planification des séances. Les séances existantes sont conservées.",
+        activateConfirm: "Activer",
+        deactivateConfirm: "Désactiver",
+        created: "La salle a été ajoutée.",
+        updated: "La salle a été mise à jour.",
+        activated: "La salle a été activée.",
+        deactivated: "La salle a été désactivée.",
+        errors: {
+          nameRequired: "Le nom de la salle est obligatoire.",
+          nameTooLong:
+            "Le nom de la salle ne doit pas dépasser 60 caractères.",
+          capacityInvalid:
+            "La capacité doit être un nombre entier entre 1 et 1000.",
+          nameTaken: "Une salle porte déjà ce nom.",
+          forbidden: "Accès refusé.",
+          generic: "Une erreur est survenue. Réessayez.",
+          sessionExpired:
+            "Votre session a expiré. Reconnectez-vous pour continuer.",
         },
       },
     },
@@ -1034,7 +1302,14 @@ export const fr = {
         schedules: {
           title: "Emplois du temps",
           description:
-            "La gestion des emplois du temps sera disponible prochainement.",
+            "Planifiez les séances des classes et publiez les emplois du temps.",
+          action: "Ouvrir",
+        },
+        rooms: {
+          title: "Salles",
+          description:
+            "Gérez les salles disponibles pour la planification des séances.",
+          action: "Ouvrir",
         },
         statistics: {
           title: "Statistiques",
@@ -1587,7 +1862,8 @@ export const fr = {
       },
       schedule: {
         title: "Emplois du temps",
-        description: "Les emplois du temps officiels seront publiés ici.",
+        description:
+          "Consultez les emplois du temps publiés de votre classe ou de vos cours.",
       },
       qa: {
         title: "Questions-Réponses",
